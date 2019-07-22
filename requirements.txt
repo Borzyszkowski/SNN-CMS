@@ -1,0 +1,7 @@
+snntoolbox
+h5py
+numpy
+matplotlib
+sklearn
+tensorflow
+keras
