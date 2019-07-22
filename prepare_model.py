@@ -1,4 +1,4 @@
-""" Train model and save to json. Save weights to h5. """
+""" Trains the model and saves it to the json format with weights in h5 format. """
 
 import h5py
 import numpy as np
