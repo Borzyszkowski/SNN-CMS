@@ -12,7 +12,7 @@ This project is investigating the potential of Spiking neural networks deployed 
 >~~~~
 >pip install -r requirements.txt
 >python prepare_model.py
->snntoolbox conversion-config.txt -t
+>snntoolbox conversion_config.txt -t
 >~~~~
 
 
