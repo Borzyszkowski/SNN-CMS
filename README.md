@@ -15,7 +15,7 @@ This project is investigating the potential of Spiking neural networks deployed 
 ### Usefull links
 
 * [hls4ML](https://hls-fpga-machine-learning.github.io/hls4ml/) - Firmware implementations of machine learning algorithms using high level synthesis language (HLS)
-* [SNNtoolbox](https://snntoolbox.readthedocs.io/en/latest/index.html) - Conversion toolbox contains functions to transform rate-based artificial neural networks into spiking neural networks, and to simulate them
+* [SNNtoolbox](https://snntoolbox.readthedocs.io/en/latest/index.html) - Conversion toolbox containing functions to transform rate-based artificial neural networks into spiking neural networks, and to simulate them
 * [Loihi chip overview](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8259423) - Loihi: A Neuromorphic
 Manycore Processor with
 On-Chip Learning
