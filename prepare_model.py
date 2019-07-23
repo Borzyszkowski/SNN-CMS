@@ -45,13 +45,12 @@ def make_model(files, json_file, h5_file):
     dropoutRate = 0.25
 
     inputArray = Input(shape=(input_shape,))
-    x = Dense(40, activation='relu')(inputArray)
+    x = Dense(64, activation='relu')(inputArray)
     x = Dropout(dropoutRate)(x)
-    x = Dense(20, activation='relu')(x)
+    x = Dense(32, activation='relu')(x)
     x = Dropout(dropoutRate)(x)
-    x = Dense(10, activation='relu')(x)
+    x = Dense(32, activation='relu')(x)
     x = Dropout(dropoutRate)(x)
-    x = Dense(5, activation='relu')(x)
 
     output = Dense(5, activation='softmax')(x)
     model = Model(inputs=inputArray, outputs=output)
