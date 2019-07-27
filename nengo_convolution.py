@@ -168,27 +168,72 @@ def classification_error(outputs, targets):
 
 do_training = False
 
-with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
-    if do_training:
-        print("error before training: %.2f%%" %
+# with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
+#     if do_training:
+#         print("error before training: %.2f%%" %
+#               sim.loss(test_data, {out_p_filt: classification_error}))
+#
+#         # run training
+#         sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
+#                   objective={out_p: crossentropy}, n_epochs=5)
+#
+#         print("error after training: %.2f%%" %
+#               sim.loss(test_data, {out_p_filt: classification_error}))
+#
+#         sim.save_params("./mnist_params")
+#     else:
+#         download("mnist_params.data-00000-of-00001",
+#                  "1BaNU7Er_Q3SJt4i4Eqbv1Ln_TkmmCXvy")
+#         download("mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
+#         download("mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
+#         sim.load_params("./mnist_params")
+#
+#     # store trained parameters back into the network
+#     sim.freeze_params(net)
+
+
+for conn in net.all_connections:
+    conn.synapse = 0.005
+
+if do_training:
+    with nengo_dl.Simulator(net, minibatch_size=minibatch_size) as sim:
+        print("error w/ synapse: %.2f%%" %
               sim.loss(test_data, {out_p_filt: classification_error}))
 
-        # run training
-        sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
-                  objective={out_p: crossentropy}, n_epochs=5)
 
-        print("error after training: %.2f%%" %
-              sim.loss(test_data, {out_p_filt: classification_error}))
+n_presentations = 50
+with nengo_loihi.Simulator(net, dt=dt, precompute=False) as sim:
+    # if running on Loihi, increase the max input spikes per step
+    if 'loihi' in sim.sims:
+        sim.sims['loihi'].snip_max_spikes_per_step = 120
 
-        sim.save_params("./mnist_params")
-    else:
-        download("mnist_params.data-00000-of-00001",
-                 "1BaNU7Er_Q3SJt4i4Eqbv1Ln_TkmmCXvy")
-        download("mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
-        download("mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
-        sim.load_params("./mnist_params")
+    # run the simulation on Loihi
+    sim.run(n_presentations * presentation_time)
 
-    # store trained parameters back into the network
-    sim.freeze_params(net)
+    # check classification error
+    step = int(presentation_time / dt)
+    output = sim.data[out_p_filt][step - 1::step]
+    correct = 100 * (np.mean(
+        np.argmax(output, axis=-1)
+        != np.argmax(test_data[out_p_filt][:n_presentations, -1],
+                     axis=-1)
+    ))
+    print("loihi error: %.2f%%" % correct)
 
 
+n_plots = 10
+plt.figure()
+
+plt.subplot(2, 1, 1)
+images = test_data[inp].reshape(-1, 28, 28, 1)[::step]
+ni, nj, nc = images[0].shape
+allimage = np.zeros((ni, nj * n_plots, nc), dtype=images.dtype)
+for i, image in enumerate(images[:n_plots]):
+    allimage[:, i * nj:(i + 1) * nj] = image
+if allimage.shape[-1] == 1:
+    allimage = allimage[:, :, 0]
+plt.imshow(allimage, aspect='auto', interpolation='none', cmap='gray')
+
+plt.subplot(2, 1, 2)
+plt.plot(sim.trange()[:n_plots * step], sim.data[out_p_filt][:n_plots * step])
+plt.legend(['%d' % i for i in range(10)], loc='best');
