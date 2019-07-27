@@ -15,6 +15,7 @@ except ImportError:
     has_requests = False
 
 import nengo_loihi
+import nengo_extras
 
 
 # helper function for later
