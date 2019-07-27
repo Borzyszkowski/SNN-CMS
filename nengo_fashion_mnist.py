@@ -14,6 +14,7 @@ from tensorflow import keras
 
 import nengo
 import nengo_dl
+import nengo_loihi
 
 # keras uses the global random seeds, so we set those here to
 # ensure the example is reproducible
