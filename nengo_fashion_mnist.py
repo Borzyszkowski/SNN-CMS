@@ -136,3 +136,14 @@ test_inputs = test_inputs[:, None, :]
 with nengo_dl.Simulator(net, minibatch_size=minibatch_size) as sim:
     sim.step(data={input_node: test_inputs})
 
+
+tensornode_output = sim.data[keras_p]
+
+for i in range(5):
+    plt.figure()
+    plt.imshow(test_images[test_inds][i], cmap="gray")
+    plt.axis("off")
+    plt.title("%s (%s)" % (
+        class_names[test_labels[test_inds][i]],
+        class_names[np.argmax(tensornode_output[i, 0])]));
+plt.show()
