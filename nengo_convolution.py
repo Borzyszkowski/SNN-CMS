@@ -168,28 +168,28 @@ def classification_error(outputs, targets):
 
 do_training = False
 
-# with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
-#     if do_training:
-#         print("error before training: %.2f%%" %
-#               sim.loss(test_data, {out_p_filt: classification_error}))
-#
-#         # run training
-#         sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
-#                   objective={out_p: crossentropy}, n_epochs=5)
-#
-#         print("error after training: %.2f%%" %
-#               sim.loss(test_data, {out_p_filt: classification_error}))
-#
-#         sim.save_params("./mnist_params")
-#     else:
-#         download("mnist_params.data-00000-of-00001",
-#                  "1BaNU7Er_Q3SJt4i4Eqbv1Ln_TkmmCXvy")
-#         download("mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
-#         download("mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
-#         sim.load_params("./mnist_params")
-#
-#     # store trained parameters back into the network
-#     sim.freeze_params(net)
+with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
+    if do_training:
+        print("error before training: %.2f%%" %
+              sim.loss(test_data, {out_p_filt: classification_error}))
+
+        # run training
+        sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
+                  objective={out_p: crossentropy}, n_epochs=5)
+
+        print("error after training: %.2f%%" %
+              sim.loss(test_data, {out_p_filt: classification_error}))
+
+        sim.save_params("./mnist_params")
+    else:
+        download("mnist_params.data-00000-of-00001",
+                 "1BaNU7Er_Q3SJt4i4Eqbv1Ln_TkmmCXvy")
+        download("mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
+        download("mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
+        sim.load_params("./mnist_params")
+
+    # store trained parameters back into the network
+    sim.freeze_params(net)
 
 
 for conn in net.all_connections:
