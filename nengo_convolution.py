@@ -75,7 +75,7 @@ for i in range(3):
     plt.figure()
     plt.imshow(np.reshape(train_data[0][i], (28, 28)))
     plt.axis('off')
-    plt.title(str(np.argmax(train_data[1][i])));
+    plt.title(str(np.argmax(train_data[1][i])))
 
 
 def conv_layer(x, *args, activation=True, **kwargs):
@@ -169,7 +169,7 @@ def classification_error(outputs, targets):
 
 do_training = False
 
-with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
+'''with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
     if do_training:
         print("error before training: %.2f%%" %
               sim.loss(test_data, {out_p_filt: classification_error}))
@@ -190,7 +190,7 @@ with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
         sim.load_params("./mnist_params")
 
     # store trained parameters back into the network
-    sim.freeze_params(net)
+    sim.freeze_params(net)'''
 
 
 for conn in net.all_connections:
