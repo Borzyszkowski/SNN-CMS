@@ -202,6 +202,7 @@ if do_training:
               sim.loss(test_data, {out_p_filt: classification_error}))
 
 
+
 n_presentations = 50
 with nengo_loihi.Simulator(net, dt=dt, precompute=False) as sim:
     # if running on Loihi, increase the max input spikes per step
