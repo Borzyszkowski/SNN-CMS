@@ -183,10 +183,10 @@ with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
 
         sim.save_params("../mnist_params/mnist_params")
     else:
-        download("mnist_params.data-00000-of-00001",
-                 "1BaNU7Er_Q3SJt4i4Eqbv1Ln_TkmmCXvy")
-        download("mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
-        download("mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
+        # download("../mnist_params/mnist_params.data-00000-of-00001",
+        #          "1BaNU7Er_Q3SJt4i4Eqbv1Ln_TkmmCXvy")
+        # download("../mnist_params/mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
+        # download("../mnist_params/mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
         sim.load_params("../mnist_params/mnist_params")
 
     # store trained parameters back into the network
