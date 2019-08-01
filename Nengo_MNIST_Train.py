@@ -1,3 +1,5 @@
+""" Trains the ANN model and deploys it on Loihi chip as a SNN. """
+
 import gzip
 import os
 import pickle
