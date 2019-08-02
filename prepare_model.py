@@ -8,7 +8,7 @@ from keras.layers import Dense, Input, Dropout
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
 from sklearn.model_selection import train_test_split
 
-from inputs_to_h5 import gen_h5
+from Inputs_to_h5 import gen_h5
 import glob
 
 # give paths to the dataset folder and json + h5 files

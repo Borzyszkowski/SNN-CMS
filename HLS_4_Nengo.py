@@ -27,7 +27,6 @@ from keras.layers import Dense, Input, Dropout
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
 from sklearn.model_selection import train_test_split
 
-from inputs_to_h5 import gen_h5
 import glob
 
 # give paths to the dataset folder and json + h5 files
@@ -129,16 +128,13 @@ n_parallel = 2  # number of parallel network repetitions
 with nengo.Network(seed=0) as net:
     # set up the default parameters for ensembles/connections
     nengo_loihi.add_params(net)
-    net.config[nengo.Ensemble].neuron_type = (
-        nengo.SpikingRectifiedLinear(amplitude=amp))
+    net.config[nengo.Ensemble].neuron_type = (nengo.SpikingRectifiedLinear(amplitude=amp))
     net.config[nengo.Ensemble].max_rates = nengo.dists.Choice([max_rate])
     net.config[nengo.Ensemble].intercepts = nengo.dists.Choice([0])
     net.config[nengo.Connection].synapse = None
 
     # the input node that will be used to feed in input images
-    inp = nengo.Node(
-        nengo.processes.PresentInput(test_data[0], presentation_time),
-        size_out=28 * 28)
+    inp = nengo.Node(nengo.processes.PresentInput(test_data[0], presentation_time), size_out=28 * 28)
 
     # the output node provides the 10-dimensional classification
     out = nengo.Node(size_in=10)
@@ -150,8 +146,9 @@ with nengo.Network(seed=0) as net:
             init=np.ones((1, 1, 1, 1)))
         # first layer is off-chip to translate the images into spikes
         net.config[layer.ensemble].on_chip = False
-        layer, conv = conv_layer(layer, 6, conv.output_shape, strides=(2, 2))
-        layer, conv = conv_layer(layer, 24, conv.output_shape, strides=(2, 2))
+        layer, conv = conv_layer(layer, 64, conv.output_shape, strides=(1, 1))
+        layer, conv = conv_layer(layer, 32, conv.output_shape, strides=(1, 1))
+        layer, conv = conv_layer(layer, 32, conv.output_shape, strides=(1, 1))
         nengo.Connection(layer, out, transform=nengo_dl.dists.Glorot())
 
     out_p = nengo.Probe(out)
@@ -159,7 +156,7 @@ with nengo.Network(seed=0) as net:
 
 
 # set up training data
-minibatch_size = 200
+minibatch_size = 128
 train_data = {inp: train_data[0][:, None, :],
               out_p: train_data[1][:, None, :]}
 
@@ -173,6 +170,7 @@ test_data = {
                         (1, int(presentation_time / dt), 1))
 }
 
+
 def crossentropy(outputs, targets):
     return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
         logits=outputs, labels=targets))
@@ -184,7 +182,8 @@ def classification_error(outputs, targets):
                              tf.argmax(targets[:, -1], axis=-1)),
                 tf.float32))
 
-do_training = False
+
+do_training = True
 
 with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
     if do_training:
@@ -200,11 +199,7 @@ with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
 
         sim.save_params("./mnist_params")
     else:
-        download("./mnist_params.data-00000-of-00001",
-                 "1BaNU7Er_Q3SJt4i4Eqbv1Ln_TkmmCXvy")
-        download("./mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
-        download("./mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
-        sim.load_params("./mnist_params")
+        exit("Training is off - exit")
 
     # store trained parameters back into the network
     sim.freeze_params(net)
