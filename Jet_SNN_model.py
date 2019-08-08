@@ -60,12 +60,11 @@ with nengo.Network(label="Jet classification") as model:
 
     # network was trained with amplitude of 0.002
     # scaling up improves performance on Loihi
-    neuron_type = nengo.LIF(tau_rc=0.02,
-                            tau_ref=0.001,
-                            amplitude=0.005)
+    neuron_type = nengo.LIF(tau_rc=0.02, tau_ref=0.001, amplitude=0.005)
 
     # below is the core model architecture
     inp = nengo.Node(np.zeros(n_inputs), label="in")
+    out = nengo.Node(size_in=5)
 
     layer_1 = nengo.Ensemble(n_neurons=64, dimensions=1, neuron_type=neuron_type, label="Layer 1")
     model.config[layer_1].on_chip = False
@@ -77,18 +76,10 @@ with nengo.Network(label="Jet classification") as model:
     layer_3 = nengo.Ensemble(n_neurons=32, dimensions=1, neuron_type=neuron_type, label="Layer 3")
     nengo.Connection(layer_2.neurons, layer_3.neurons, transform=nengo_dl.dists.Glorot())
 
-    char_synapse = nengo.synapses.Alpha(0.005)
+    nengo.Connection(layer_3.neurons, out, transform=nengo_dl.dists.Glorot())
 
-    # --- char_out as node
-    char_out = nengo.Node(None, label="out", size_in=n_outputs)
-    # char_output_bias = nengo.Node(params["char_output_bias"])
-    # nengo.Connection(char_output_bias, char_out, synapse=None)
-    # nengo.Connection(layer_3.neurons, char_out) #,transform=params["x_c_1 -> char_output"])
-    # char_probe = nengo.Probe(char_out, synapse=char_synapse)
-
-    model.inp = inp
-    out_p = nengo.Probe(char_out)
-    out_p_filt = nengo.Probe(char_out, synapse=nengo.Alpha(0.01))
+    out_p = nengo.Probe(out)
+    out_p_filt = nengo.Probe(out, synapse=nengo.Alpha(0.01))
 
 
 def crossentropy(outputs, targets):
@@ -142,32 +133,26 @@ test_data = {
                         (1, int(presentation_time / dt), 1))
 }
 
-do_training = False
+do_training = True
 with nengo_dl.Simulator(model, minibatch_size=minibatch_size, seed=0) as sim:
     if do_training == True:
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
         # run training
-        # sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
-        #           objective={out_p: crossentropy}, n_epochs=5)
+        sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
+                  objective={out_p: crossentropy}, n_epochs=5)
 
         print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
         sim.save_params("./jet_params")
     else:
-        # model_files = './model_files'
-        # meta_file = glob.glob(model_files + '/*.meta')
-        # index_file = glob.glob(model_files + '/*.index')
-        # data_file = glob.glob(model_files + '/*.data-00000-of-00001')
 
-        print("error before training: %.2f%%" %
-              sim.loss(test_data, {out_p_filt: classification_error}))
+        print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
         sim.load_params("./model_files/jet_file.ckpt")
         print("parameters loaded")
 
-        print("error after training: %.2f%%" %
-              sim.loss(test_data, {out_p_filt: classification_error}))
+        print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
     # store trained parameters back into the network
     sim.freeze_params(model)
