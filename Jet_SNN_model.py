@@ -141,9 +141,10 @@ test_data = {
     out_p_filt: np.tile(test_data[1][:, None, :],
                         (1, int(presentation_time / dt), 1))
 }
+
 do_training = False
 with nengo_dl.Simulator(model, minibatch_size=minibatch_size, seed=0) as sim:
-    if do_training:
+    if do_training == True:
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
         # run training
