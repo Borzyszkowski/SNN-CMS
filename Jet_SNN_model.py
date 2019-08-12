@@ -58,11 +58,11 @@ with nengo.Network(label="Jet classification") as model:
     nengo_loihi.add_params(model)
     model.config[nengo.Connection].synapse = None
 
-    # network was trained with amplitude of 0.002
-    # scaling up improves performance on Loihi
+    model.config[nengo.Ensemble].max_rates = nengo.dists.Choice([200])
+    model.config[nengo.Ensemble].intercepts = nengo.dists.Choice([0])
+
     neuron_type = nengo.LIF(tau_rc=0.02, tau_ref=0.001, amplitude=0.005)
 
-    # below is the core model architecture
     inp = nengo.Node(np.zeros(n_inputs), label="in")
     out = nengo.Node(size_in=5)
 
@@ -83,15 +83,12 @@ with nengo.Network(label="Jet classification") as model:
 
 
 def crossentropy(outputs, targets):
-    return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
-        logits=outputs, labels=targets))
+    return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=outputs, labels=targets))
 
 
 def classification_error(outputs, targets):
     return 100 * tf.reduce_mean(
-        tf.cast(tf.not_equal(tf.argmax(outputs[:, -1], axis=-1),
-                             tf.argmax(targets[:, -1], axis=-1)),
-                tf.float32))
+        tf.cast(tf.not_equal(tf.argmax(outputs[:, -1], axis=-1), tf.argmax(targets[:, -1], axis=-1)), tf.float32))
 
 
 train_data = features
@@ -135,12 +132,11 @@ test_data = {
 
 do_training = True
 with nengo_dl.Simulator(model, minibatch_size=minibatch_size, seed=0) as sim:
-    if do_training == True:
+    if do_training:
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
         # run training
-        sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
-                  objective={out_p: crossentropy}, n_epochs=5)
+        sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001), objective={out_p: crossentropy}, n_epochs=10)
 
         print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
@@ -162,10 +158,9 @@ for conn in model.all_connections:
 
 if do_training:
     with nengo_dl.Simulator(model, minibatch_size=minibatch_size) as sim:
-        print("error w/ synapse: %.2f%%" %
-              sim.loss(test_data, {out_p_filt: classification_error}))
+        print("error w/ synapse: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
-n_presentations = 50
+n_presentations = 100
 with nengo_loihi.Simulator(model, dt=dt, precompute=False) as sim:
     # if running on Loihi, increase the max input spikes per step
     if 'loihi' in sim.sims:
@@ -177,9 +172,6 @@ with nengo_loihi.Simulator(model, dt=dt, precompute=False) as sim:
     # check classification error
     step = int(presentation_time / dt)
     output = sim.data[out_p_filt][step - 1::step]
-    correct = 100 * (np.mean(
-        np.argmax(output, axis=-1)
-        != np.argmax(test_data[out_p_filt][:n_presentations, -1],
-                     axis=-1)
-    ))
+    correct = 100 * (np.mean(np.argmax(output, axis=-1) !=
+                             np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1)))
     print("loihi error: %.2f%%" % correct)
