@@ -145,6 +145,6 @@ with nengo_loihi.Simulator(model) as sim:
     correct = 100 * (np.mean(np.argmax(output, axis=-1) !=
                     np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1)))
 
+    print("loihi error: %.2f%%" % correct)
     print("Predicted labels: ", np.argmax(output, axis=-1))
     print("Correct labels: ", np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1))
-    print("loihi error: %.2f%%" % correct)
