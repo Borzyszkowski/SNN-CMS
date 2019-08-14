@@ -1,19 +1,10 @@
-import os
-import pickle
-import string
+""" Solving a Jet Tagging problem with Spiking Neural Networks deployed on the Loihi chip. """
 
 import h5py
 import glob
-
 import nengo
 import numpy as np
 import nengo_dl
-try:
-    import requests
-    has_requests = True
-except ImportError:
-    has_requests = False
-
 import nengo_loihi
 import tensorflow as tf
 
@@ -42,18 +33,25 @@ for fileIN in dataset:
     target = np.concatenate([target, mytarget], axis=0) if target.size else mytarget
 print(target.shape, features.shape)
 
+# splitting the train / test data in ratio 80:20
+train_features = features[:64000]
+train_targets = target[:64000]
+test_features = features[64000:]
+test_targets = target[64000:]
+
+# creating a train and test dataset
+test_data = []
+train_data = []
+train_data.append(train_features)
+train_data.append(train_targets)
+test_data.append(test_features)
+test_data.append(test_targets)
+
 n_inputs = 16
 n_outputs = 5
 n_neurons = 256
 
-# allowed_text = ["loha", "alha", "aloa", "aloh", "aoha", "aloha"]
-# id_to_char = np.array([x for x in string.ascii_lowercase + "\" -|"])
-
-# params = load("reference_params.pkl", "149rLqXnJqZPBiqvWpOAysGyq4fvunlnM")
-# test_stream = load("test_stream.pkl", "1AQavHjQKNu1sso0jqYhWj6zUBLKuGNvV")
-
-
-# core speech model for keyword spotting
+# model for Jet classification
 with nengo.Network(label="Jet classification") as model:
     nengo_loihi.add_params(model)
     model.config[nengo.Connection].synapse = None
@@ -91,63 +89,34 @@ def classification_error(outputs, targets):
         tf.cast(tf.not_equal(tf.argmax(outputs[:, -1], axis=-1), tf.argmax(targets[:, -1], axis=-1)), tf.float32))
 
 
-train_data = features
-test_data = target
 dt = 0.001  # simulation timestep
 presentation_time = 0.1  # input presentation time
-max_rate = 100  # neuron firing rates
-# neuron spike amplitude (scaled so that the overall output is ~1)
-amp = 1 / max_rate
-# input image shape
-input_shape = 16  ### ????????? ''''''
-print(input_shape)
-n_parallel = 2  # number of parallel network repetitions
-minibatch_size = 200
-
-
-train_features = features[:60000]
-train_targets = target[:60000]
-test_features = features[60000:]
-test_targets = target[60000:]
-test_data = []
-train_data = []
-train_data.append(train_features)
-train_data.append(train_targets)
-test_data.append(test_features)
-test_data.append(test_targets)
-
-
-train_data = {inp: train_data[0][:, None, :],
-              out_p: train_data[1][:, None, :]}
+train_data = {inp: train_data[0][:, None, :], out_p: train_data[1][:, None, :]}
 
 # for the test data evaluation we'll be running the network over time
 # using spiking neurons, so we need to repeat the input/target data
 # for a number of timesteps (based on the presentation_time)
-test_data = {
-    inp: np.tile(test_data[0][:, None, :],
-                 (1, int(presentation_time / dt), 1)),
-    out_p_filt: np.tile(test_data[1][:, None, :],
-                        (1, int(presentation_time / dt), 1))
-}
+test_data = {inp: np.tile(test_data[0][:, None, :], (1, int(presentation_time / dt), 1)),
+             out_p_filt: np.tile(test_data[1][:, None, :], (1, int(presentation_time / dt), 1))}
 
+minibatch_size = 200
 do_training = True
 with nengo_dl.Simulator(model, minibatch_size=minibatch_size, seed=0) as sim:
     if do_training:
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
-
         # run training
-        sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001), objective={out_p: crossentropy}, n_epochs=10)
-
+        sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
+                  objective={out_p: crossentropy}, n_epochs=20)
         print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
-
         sim.save_params("./jet_params")
+
+        n_presentations = 500
+        step = int(presentation_time / dt)
+
     else:
-
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
-
         sim.load_params("./model_files/jet_file.ckpt")
         print("parameters loaded")
-
         print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
     # store trained parameters back into the network
@@ -160,8 +129,8 @@ if do_training:
     with nengo_dl.Simulator(model, minibatch_size=minibatch_size) as sim:
         print("error w/ synapse: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
-n_presentations = 100
-with nengo_loihi.Simulator(model, dt=dt, precompute=False) as sim:
+n_presentations = 50
+with nengo_loihi.Simulator(model) as sim:
     # if running on Loihi, increase the max input spikes per step
     if 'loihi' in sim.sims:
         sim.sims['loihi'].snip_max_spikes_per_step = 120
@@ -172,6 +141,10 @@ with nengo_loihi.Simulator(model, dt=dt, precompute=False) as sim:
     # check classification error
     step = int(presentation_time / dt)
     output = sim.data[out_p_filt][step - 1::step]
+
     correct = 100 * (np.mean(np.argmax(output, axis=-1) !=
-                             np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1)))
+                    np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1)))
+
+    print("Predicted labels: ", np.argmax(output, axis=-1))
+    print("Correct labels: ", np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1))
     print("loihi error: %.2f%%" % correct)
