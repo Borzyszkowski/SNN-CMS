@@ -7,6 +7,7 @@ import numpy as np
 import nengo_dl
 import nengo_loihi
 import tensorflow as tf
+import nengo_extras
 
 # give paths to the dataset folder and json + h5 files
 data_path = './dataset'
@@ -49,17 +50,21 @@ test_data.append(test_targets)
 
 n_inputs = 16
 n_outputs = 5
-n_neurons = 256
+max_rate = 200
+amplitude = 1/max_rate
 
 # model for Jet classification
 with nengo.Network(label="Jet classification") as model:
     nengo_loihi.add_params(model)
     model.config[nengo.Connection].synapse = None
 
-    model.config[nengo.Ensemble].max_rates = nengo.dists.Choice([200])
+    model.config[nengo.Ensemble].max_rates = nengo.dists.Choice([max_rate])
     model.config[nengo.Ensemble].intercepts = nengo.dists.Choice([0])
 
-    neuron_type = nengo.LIF(tau_rc=0.02, tau_ref=0.001, amplitude=0.005)
+    neuron_type = nengo.SpikingRectifiedLinear(amplitude=amplitude)
+    # neuron_type = nengo.LIF(tau_rc=0.02, tau_ref=0.001, amplitude=0.005)
+    # neuron_type = nengo.AdaptiveLIF(amplitude=0.005)
+    # neuron_type = nengo.Izhikevich()
 
     inp = nengo.Node(np.zeros(n_inputs), label="in")
     out = nengo.Node(size_in=5)
@@ -109,10 +114,6 @@ with nengo_dl.Simulator(model, minibatch_size=minibatch_size, seed=0) as sim:
                   objective={out_p: crossentropy}, n_epochs=20)
         print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
         sim.save_params("./jet_params")
-
-        n_presentations = 500
-        step = int(presentation_time / dt)
-
     else:
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
         sim.load_params("./model_files/jet_file.ckpt")
@@ -129,8 +130,8 @@ if do_training:
     with nengo_dl.Simulator(model, minibatch_size=minibatch_size) as sim:
         print("error w/ synapse: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
-n_presentations = 50
-with nengo_loihi.Simulator(model) as sim:
+n_presentations = 500
+with nengo_loihi.Simulator(model, dt=dt, precompute=False) as sim:
     # if running on Loihi, increase the max input spikes per step
     if 'loihi' in sim.sims:
         sim.sims['loihi'].snip_max_spikes_per_step = 120
@@ -143,8 +144,8 @@ with nengo_loihi.Simulator(model) as sim:
     output = sim.data[out_p_filt][step - 1::step]
 
     correct = 100 * (np.mean(np.argmax(output, axis=-1) !=
-                    np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1)))
+                             np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1)))
 
-    print("loihi error: %.2f%%" % correct)
     print("Predicted labels: ", np.argmax(output, axis=-1))
     print("Correct labels: ", np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1))
+    print("loihi error: %.2f%%" % correct)
