@@ -8,6 +8,9 @@ import nengo_dl
 import nengo_loihi
 import tensorflow as tf
 import nengo_extras
+import pickle
+import gzip
+
 
 # give paths to the dataset folder and json + h5 files
 data_path = './dataset'
@@ -41,16 +44,16 @@ test_features = features[64000:]
 test_targets = target[64000:]
 
 # creating a train and test dataset
-test_data = []
-train_data = []
-train_data.append(train_features)
-train_data.append(train_targets)
-test_data.append(test_features)
-test_data.append(test_targets)
+test_d = []
+train_d = []
+train_d.append(train_features)
+train_d.append(train_targets)
+test_d.append(test_features)
+test_d.append(test_targets)
 
 n_inputs = 16
 n_outputs = 5
-max_rate = 200
+max_rate = 100
 amplitude = 1/max_rate
 
 # model for Jet classification
@@ -67,17 +70,20 @@ with nengo.Network(label="Jet classification") as model:
     # neuron_type = nengo.Izhikevich()
 
     inp = nengo.Node(np.zeros(n_inputs), label="in")
-    out = nengo.Node(size_in=5)
+    out = nengo.Node(size_in=n_outputs)
 
     layer_1 = nengo.Ensemble(n_neurons=64, dimensions=1, neuron_type=neuron_type, label="Layer 1")
     model.config[layer_1].on_chip = False
     nengo.Connection(inp, layer_1.neurons, transform=nengo_dl.dists.Glorot())
+    p1 = nengo.Probe(layer_1.neurons)
 
     layer_2 = nengo.Ensemble(n_neurons=32, dimensions=1, neuron_type=neuron_type, label="Layer 2")
     nengo.Connection(layer_1.neurons, layer_2.neurons, transform=nengo_dl.dists.Glorot())
+    p2 = nengo.Probe(layer_2.neurons)
 
     layer_3 = nengo.Ensemble(n_neurons=32, dimensions=1, neuron_type=neuron_type, label="Layer 3")
     nengo.Connection(layer_2.neurons, layer_3.neurons, transform=nengo_dl.dists.Glorot())
+    p3 = nengo.Probe(layer_3.neurons)
 
     nengo.Connection(layer_3.neurons, out, transform=nengo_dl.dists.Glorot())
 
@@ -96,13 +102,13 @@ def classification_error(outputs, targets):
 
 dt = 0.001  # simulation timestep
 presentation_time = 0.1  # input presentation time
-train_data = {inp: train_data[0][:, None, :], out_p: train_data[1][:, None, :]}
+train_data = {inp: train_d[0][:, None, :], out_p: train_d[1][:, None, :]}
 
 # for the test data evaluation we'll be running the network over time
 # using spiking neurons, so we need to repeat the input/target data
 # for a number of timesteps (based on the presentation_time)
-test_data = {inp: np.tile(test_data[0][:, None, :], (1, int(presentation_time / dt), 1)),
-             out_p_filt: np.tile(test_data[1][:, None, :], (1, int(presentation_time / dt), 1))}
+test_data = {inp: np.tile(test_d[0][:, None, :], (1, int(presentation_time / dt), 1)),
+             out_p_filt: np.tile(test_d[1][:, None, :], (1, int(presentation_time / dt), 1))}
 
 minibatch_size = 200
 do_training = True
@@ -130,11 +136,18 @@ if do_training:
     with nengo_dl.Simulator(model, minibatch_size=minibatch_size) as sim:
         print("error w/ synapse: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
-n_presentations = 500
+n_presentations = 50
 with nengo_loihi.Simulator(model, dt=dt, precompute=False) as sim:
     # if running on Loihi, increase the max input spikes per step
     if 'loihi' in sim.sims:
         sim.sims['loihi'].snip_max_spikes_per_step = 120
+
+    print("Layer 1 number of spikes: ", (sim.data[p1] > 0).sum(axis=0))
+    print("Layer 1: ", (sim.data[p1]))
+    print("Layer 2 number of spikes: ", (sim.data[p2] > 0).sum(axis=0))
+    print("Layer 2: ", (sim.data[p2]))
+    print("Layer 3 number of spikes: ", (sim.data[p3] > 0).sum(axis=0))
+    print("Layer 3: ", (sim.data[p3]))
 
     # run the simulation on Loihi
     sim.run(n_presentations * presentation_time)
