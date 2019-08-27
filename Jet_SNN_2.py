@@ -93,9 +93,9 @@ with nengo.Network(label="Jet classification") as model:
     layer2 = nengo.Ensemble(120, 1, neuron_type=neuron_type)
     out = nengo.Node(size_in=5)
 
-    nengo.Connection(u, layer1.neurons, transform=1)
-    nengo.Connection(layer1.neurons, layer2.neurons, transform=2)
-    nengo.Connection(layer2.neurons, out, transform=3)
+    nengo.Connection(u, layer1.neurons, transform=nengo_dl.dists.Glorot())
+    nengo.Connection(layer1.neurons, layer2.neurons, transform=nengo_dl.dists.Glorot())
+    nengo.Connection(layer2.neurons, out, transform=nengo_dl.dists.Glorot())
 
     layer1_p = nengo.Probe(layer1.neurons)
     layer2_p = nengo.Probe(layer2.neurons)
