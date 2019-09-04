@@ -11,7 +11,6 @@ import nengo_extras
 import pickle
 import gzip
 
-
 # give paths to the dataset folder and json + h5 files
 data_path = './dataset'
 json_path = "model.json"
@@ -37,11 +36,22 @@ for fileIN in dataset:
     target = np.concatenate([target, mytarget], axis=0) if target.size else mytarget
 print(target.shape, features.shape)
 
+# with gzip.open('mnist.pkl.gz') as f:
+#     train_data, _, test_data = pickle.load(f, encoding="latin1")
+# train_d = list(train_data)
+# test_d = list(test_data)
+# data = []
+# for data in (train_d, test_d):
+#     one_hot = np.zeros((data[0].shape[0], 10))
+#     one_hot[np.arange(data[0].shape[0]), data[1]] = 1
+#     data[1] = one_hot
+
 # splitting the train / test data in ratio 80:20
-train_features = features[:64000]
-train_targets = target[:64000]
-test_features = features[64000:]
-test_targets = target[64000:]
+train_data_num = int(target.shape[0] * 0.8)
+train_features = features[:train_data_num]
+train_targets = target[:train_data_num]
+test_features = features[train_data_num:]
+test_targets = target[train_data_num:]
 
 # creating a train and test dataset
 test_d = []
@@ -55,6 +65,7 @@ n_inputs = 16
 n_outputs = 5
 max_rate = 100
 amplitude = 1/max_rate
+presentation_time = 0.1
 
 # model for Jet classification
 with nengo.Network(label="Jet classification") as model:
@@ -65,11 +76,13 @@ with nengo.Network(label="Jet classification") as model:
     model.config[nengo.Ensemble].intercepts = nengo.dists.Choice([0])
 
     neuron_type = nengo.SpikingRectifiedLinear(amplitude=amplitude)
-    # neuron_type = nengo.LIF(tau_rc=0.02, tau_ref=0.001, amplitude=0.005)
-    # neuron_type = nengo.AdaptiveLIF(amplitude=0.005)
+    # neuron_type = nengo.LIF(tau_rc=0.02, tau_ref=0.001, amplitude=amplitude)
+    # neuron_type = nengo.AdaptiveLIF(amplitude=amplitude)
     # neuron_type = nengo.Izhikevich()
 
-    inp = nengo.Node(np.zeros(n_inputs), label="in")
+    # inp = nengo.Node(np.zeros(n_inputs), label="in")
+    inp = nengo.Node(nengo.processes.PresentInput(test_d[0], presentation_time), size_out=16)
+
     out = nengo.Node(size_in=n_outputs)
 
     layer_1 = nengo.Ensemble(n_neurons=64, dimensions=1, neuron_type=neuron_type, label="Layer 1")
@@ -117,8 +130,10 @@ with nengo_dl.Simulator(model, minibatch_size=minibatch_size, seed=0) as sim:
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
         # run training
         sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
-                  objective={out_p: crossentropy}, n_epochs=20)
+                  objective={out_p: crossentropy}, n_epochs=50)
         print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
+        # output = sim.run(test_data, {test_data, {out_p_filt: classification_error}})
+        print(sim.data)
         sim.save_params("./jet_params")
     else:
         print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
