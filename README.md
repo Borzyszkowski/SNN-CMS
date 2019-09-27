@@ -1,5 +1,5 @@
 # SNN-CMS
-Neuromorphic computing (Spiking Neural Networks) with utilization of Loihi chips in LHC experiments, CMS detector, CERN.
+Neuromorphic computing (Spiking Neural Networks) with utilization of Loihi chips in LHC experiments, CMS detector, the European Organization for Nuclear Research.
 
 ## Overview
 
