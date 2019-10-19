@@ -12,11 +12,20 @@ This project is investigating the potential of Spiking neural networks deployed 
 
 ### How to run?
 >~~~~
+>git clone https://github.com/Borzyszkowski/SNN-CMS.git
 >pip install -r requirements.txt
+>~~~~
+
+##### Simulation with SNN Toolbox:
+>~~~~
 >python prepare_model.py
 >snntoolbox conversion_config.txt -t
 >~~~~
 
+##### On-chip inference:
+>~~~~
+>python Jet_SNN_model.py
+>~~~~
 
 
 ### Usefull links
