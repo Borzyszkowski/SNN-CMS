@@ -32,7 +32,7 @@ This project is investigating the potential of Spiking neural networks deployed 
 
 Use specific branches of the repository and follow instructions of README file in every branch.
 
-### Usefull links
+### Useful links
 
 * [hls4ML](https://hls-fpga-machine-learning.github.io/hls4ml/) - Firmware implementations of machine learning algorithms using high level synthesis language (HLS)
 * [SNNtoolbox](https://snntoolbox.readthedocs.io/en/latest/index.html) - Conversion toolbox containing functions to transform rate-based artificial neural networks into spiking neural networks, and to simulate them
