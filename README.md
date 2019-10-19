@@ -13,20 +13,24 @@ This project is investigating the potential of Spiking neural networks deployed 
 ### How to run?
 >~~~~
 >git clone https://github.com/Borzyszkowski/SNN-CMS.git
->pip install -r requirements.txt
 >~~~~
 
-##### Simulation with SNN Toolbox:
+##### Jet Tagging - Simulation with SNN Toolbox:
 >~~~~
->python prepare_model.py
->snntoolbox conversion_config.txt -t
->~~~~
-
-##### On-chip inference:
->~~~~
->python Jet_SNN_model.py
+>git checkout SNNToolbox_model
 >~~~~
 
+##### Jet Tagging - Loihi on-chip inference with Nengo and NxSDK:
+>~~~~
+>git checkout Nengo_model
+>~~~~
+
+##### Other SNN experiments with Nengo and NxSDK:
+>~~~~
+>git checkout Nengo_experiments
+>~~~~
+
+Use specific branches of the repository and follow instructions of README files in every branch.
 
 ### Usefull links
 
