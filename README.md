@@ -30,7 +30,7 @@ Classification of Jets on the images with convolutional SNNs:
 >SLURM python3 Jet_ConvSNN.py
 >~~~~
 
-### Usefull links
+### Useful links
 
 * [hls4ML](https://hls-fpga-machine-learning.github.io/hls4ml/) - Firmware implementations of machine learning algorithms using high level synthesis language (HLS)
 * [Nengo Loihi](https://www.nengo.ai/nengo-loihi/overview.html) - Nengo Loihi is a Python package for running Nengo models on Loihi boards
