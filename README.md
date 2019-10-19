@@ -30,7 +30,7 @@ This project is investigating the potential of Spiking neural networks deployed 
 >git checkout Nengo_experiments
 >~~~~
 
-Use specific branches of the repository and follow instructions of README files in every branch.
+Use specific branches of the repository and follow instructions of README file in every branch.
 
 ### Usefull links
 
