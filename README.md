@@ -1,5 +1,5 @@
 # SNN-CMS
-Simulation of Spiking Neural Networks in SNNToolbox to solve a Jet Tagging Problem.
+Simulation of Spiking Neural Networks in SNNToolbox to solve the Jet Tagging Problem.
 
 ### How to run?
 >~~~~
