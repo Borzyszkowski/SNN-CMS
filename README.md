@@ -4,6 +4,7 @@ Simulation or deployment of Spiking Neural Network for inference on the Loihi ch
 ### How to run?
 
 #### Simulation
+Classification of Jets using SNNs from the natural representation with 16 features:
 >~~~~
 >pip install -r requirements.txt
 >python Jet_SNN_model.py
@@ -15,7 +16,9 @@ Classification of Jets on the images with convolutional SNNs:
 >~~~~
 
 #### On-chip inference
-To execute code on the remote Loihi Superhost please configure your machine using following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After succesfull installation run the code on the Superhost with a following command:
+To execute code on the remote Loihi Superhost please configure your machine using following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After succesfull installation run the code on the Superhost with a following commands.
+
+Classification of Jets using SNNs from the natural representation with 16 features:
 >~~~~
 >SLURM python3 Jet_SNN_model.py
 >~~~~
