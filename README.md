@@ -1,5 +1,5 @@
 # SNN-CMS
-Simulation or deployment of Spiking Neural Network for inference on the Loihi chip to solve a Jet Tagging Problem with use of Nengo and NxSDK frameworks.
+Simulation or deployment of Spiking Neural Networks for inference on the Loihi chip to solve a Jet Tagging Problem with use of Nengo and NxSDK frameworks.
 
 ### How to run?
 
@@ -7,7 +7,7 @@ Simulation or deployment of Spiking Neural Network for inference on the Loihi ch
 >~~~~
 >pip install -r requirements.txt
 >~~~~
-Classification of Jets using SNNs from the natural representation with 16 features:
+Classification of Jets using fully-connected SNNs from the natural representation with 16 features:
 >~~~~
 >python Jet_SNN_model.py
 >~~~~
@@ -20,7 +20,7 @@ Classification of Jets on the images with convolutional SNNs:
 #### On-chip inference
 To execute code on the remote Loihi Superhost please configure your machine using following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After succesfull installation run the code on the Superhost with the following commands:
 
-Classification of Jets using SNNs from the natural representation with 16 features:
+Classification of Jets using fully-connected SNNs from the natural representation with 16 features:
 >~~~~
 >SLURM python3 Jet_SNN_model.py
 >~~~~
