@@ -1,5 +1,5 @@
 # SNN-CMS
-Simulation or deployment of Spiking Neural Network for inference on the Loihi chip to solve a Jet Tagging Problem with use of Nengo and NxSDK frameworks.
+Simulation or deployment of Spiking Neural Networks for inference on the Loihi chip to solve a Jet Tagging Problem with use of Nengo and NxSDK frameworks.
 
 ### How to run?
 
