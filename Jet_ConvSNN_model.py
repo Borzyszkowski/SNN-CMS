@@ -13,7 +13,9 @@ import tensorflow as tf
 import nengo_loihi
 import nengo_extras
 import glob
-
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
 
 # give paths to the dataset folder and json + h5 files
 data_path = './dataset'
@@ -23,13 +25,10 @@ h5_path = "weights.h5"
 print("loading the dataset")
 # Get folder path containing text files
 file_list = glob.glob(data_path + '/*.h5')
-dat = []
+dataset = []
 for file_path in file_list:
-    dat.append(file_path)
+    dataset.append(file_path)
 print("dataset loaded")
-
-# take only one file because the dataset is big enough
-dataset = dat[:1]
 
 # preparing the dataset
 target = np.array([])
@@ -37,35 +36,20 @@ features = np.array([])
 for fileIN in dataset:
     # print("Appending %s" % fileIN)
     f = h5py.File(fileIN)
-    myFeatures = np.array(f.get("jetImage"))
+    myFeatures = np.array(f.get("jets")[:, [12, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 48, 52]])
     mytarget = np.array(f.get('jets')[0:, -6:-1])
     features = np.concatenate([features, myFeatures], axis=0) if features.size else myFeatures
     target = np.concatenate([target, mytarget], axis=0) if target.size else mytarget
 print(target.shape, features.shape)
+class_names = np.array(['g', 'q', 'w', 'z', 't'], dtype=str)
 
-# flatten the dataset for two dimensions
-num_pixels = features.shape[1] * features.shape[2]
-features = features.reshape(features.shape[0], num_pixels).astype('float32')
-print(target.shape, features.shape)
-
-
-# with gzip.open('mnist.pkl.gz') as f:
-#     train_data, _, test_data = pickle.load(f, encoding="latin1")
-# train_d = list(train_data)
-# test_d = list(test_data)
-# data = []
-# for data in (train_d, test_d):
-#     one_hot = np.zeros((data[0].shape[0], 10))
-#     one_hot[np.arange(data[0].shape[0]), data[1]] = 1
-#     data[1] = one_hot
 
 # splitting the train / test data in ratio 80:20
-# take only a small part of data because the dataset is too big for allocating
-train_data_num = int(target.shape[0] * 0.1)
+train_data_num = int(target.shape[0] * 0.8)
 train_features = features[:train_data_num]
 train_targets = target[:train_data_num]
-test_features = features[train_data_num:train_data_num+int(train_data_num/2)]
-test_targets = target[train_data_num:train_data_num+int(train_data_num/2)]
+test_features = features[train_data_num:]
+test_targets = target[train_data_num:]
 
 # creating a train and test dataset
 test_d = []
@@ -74,8 +58,6 @@ train_d.append(train_features)
 train_d.append(train_targets)
 test_d.append(test_features)
 test_d.append(test_targets)
-print(train_d[0].shape, train_d[1].shape)
-print(test_d[0].shape, test_d[1].shape)
 
 
 def conv_layer(x, *args, activation=True, **kwargs):
@@ -105,7 +87,7 @@ max_rate = 100  # neuron firing rates
 # neuron spike amplitude (scaled so that the overall output is ~1)
 amp = 1 / max_rate
 # input image shape
-input_shape = (1, 100, 100)
+input_shape = (1, 4, 4)
 n_parallel = 2  # number of parallel network repetitions
 
 with nengo.Network(seed=0) as net:
@@ -118,7 +100,9 @@ with nengo.Network(seed=0) as net:
     net.config[nengo.Connection].synapse = None
 
     # the input node that will be used to feed in input images
-    inp = nengo.Node(nengo.processes.PresentInput(test_d[0], presentation_time), size_out=10000)
+    inp = nengo.Node(
+        nengo.processes.PresentInput(test_d[0], presentation_time),
+        size_out=16)
 
     # the output node provides the 10-dimensional classification
     out = nengo.Node(size_in=5)
@@ -128,16 +112,14 @@ with nengo.Network(seed=0) as net:
         layer, conv = conv_layer(inp, 1, input_shape, kernel_size=(1, 1), init=np.ones((1, 1, 1, 1)))
         # first layer is off-chip to translate the images into spikes
         net.config[layer.ensemble].on_chip = False
-        layer, conv = conv_layer(layer, 64, conv.output_shape, strides=(2, 2))
-        layer, conv = conv_layer(layer, 32, conv.output_shape, strides=(2, 2))
-        layer, conv = conv_layer(layer, 32, conv.output_shape, strides=(2, 2))
+        layer, conv = conv_layer(layer, 16, conv.output_shape, strides=(1, 1))
 
         nengo.Connection(layer, out, transform=nengo_dl.dists.Glorot())
 
     out_p = nengo.Probe(out)
     out_p_filt = nengo.Probe(out, synapse=nengo.Alpha(0.01))
 
-print('model built')
+
 # set up training data
 minibatch_size = 200
 train_data = {inp: train_d[0][:, None, :], out_p: train_d[1][:, None, :]}
@@ -162,10 +144,51 @@ def classification_error(outputs, targets):
         tf.cast(tf.not_equal(tf.argmax(outputs[:, -1], axis=-1), tf.argmax(targets[:, -1], axis=-1)), tf.float32))
 
 
+def plot_confusion_matrix(y_true, y_pred, classes, normalize=False,  title=None, cmap=plt.cm.Blues):
+    # This function prints and plots the confusion matrix. Normalization can be applied by setting `normalize=True`.
+    if not title:
+        if normalize:
+            title = 'Normalized confusion matrix'
+        else:
+            title = 'Confusion matrix, without normalization'
+
+    # Compute confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    # Only use the labels that appear in the data
+    classes = classes[unique_labels(y_true, y_pred)]
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
+    ax.set(xticks=np.arange(cm.shape[1]), yticks=np.arange(cm.shape[0]), xticklabels=classes, yticklabels=classes,
+           title=title, ylabel='True label', xlabel='Predicted label')
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+
+    # Loop over data dimensions and create text annotations.
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt), ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+    fig.tight_layout()
+    return ax
+
+
 do_training = True
 with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
     if do_training:
-        print("error before training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
+        print("error before training: %.2f%%" %
+              sim.loss(test_data, {out_p_filt: classification_error}))
 
         # run training
         sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
@@ -206,9 +229,32 @@ with nengo_loihi.Simulator(net, dt=dt, precompute=False) as sim:
     # check classification error
     step = int(presentation_time / dt)
     output = sim.data[out_p_filt][step - 1::step]
-    correct = 100 * (np.mean(
+    error_percentage = 100 * (np.mean(
         np.argmax(output, axis=-1)
         != np.argmax(test_data[out_p_filt][:n_presentations, -1],
                      axis=-1)
     ))
-    print("loihi error: %.2f%%" % correct)
+
+    predicted = np.argmax(output, axis=-1)
+    correct = np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1)
+
+    predicted = np.array(predicted, dtype=int)
+    correct = np.array(correct, dtype=int)
+
+    print("Predicted labels: ", predicted)
+    print("Correct labels: ", correct)
+    print("loihi error: %.2f%%" % error_percentage)
+
+    np.set_printoptions(precision=2)
+
+    # Plot non-normalized confusion matrix
+    plot_confusion_matrix(correct, predicted, classes=class_names,
+                          title='Confusion matrix, without normalization')
+
+    # Plot normalized confusion matrix
+    plot_confusion_matrix(correct, predicted, classes=class_names, normalize=True,
+                          title='Normalized confusion matrix')
+
+    plt.show()
+
+
