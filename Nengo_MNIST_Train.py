@@ -67,6 +67,7 @@ with gzip.open('mnist.pkl.gz') as f:
     train_data, _, test_data = pickle.load(f, encoding="latin1")
 train_data = list(train_data)
 test_data = list(test_data)
+data = []
 for data in (train_data, test_data):
     one_hot = np.zeros((data[0].shape[0], 10))
     one_hot[np.arange(data[0].shape[0]), data[1]] = 1
@@ -78,6 +79,7 @@ for i in range(3):
     plt.imshow(np.reshape(train_data[0][i], (28, 28)))
     plt.axis('off')
     plt.title(str(np.argmax(train_data[1][i])))
+print(data[1].shape, data[0].shape)
 
 
 def conv_layer(x, *args, activation=True, **kwargs):
@@ -128,15 +130,11 @@ with nengo.Network(seed=0) as net:
 
     # build parallel copies of the network
     for _ in range(n_parallel):
-        layer, conv = conv_layer(
-            inp, 1, input_shape, kernel_size=(1, 1),
-            init=np.ones((1, 1, 1, 1)))
+        layer, conv = conv_layer(inp, 1, input_shape, kernel_size=(1, 1), init=np.ones((1, 1, 1, 1)))
         # first layer is off-chip to translate the images into spikes
         net.config[layer.ensemble].on_chip = False
-        layer, conv = conv_layer(layer, 6, conv.output_shape,
-                                 strides=(2, 2))
-        layer, conv = conv_layer(layer, 24, conv.output_shape,
-                                 strides=(2, 2))
+        layer, conv = conv_layer(layer, 6, conv.output_shape, strides=(2, 2))
+        layer, conv = conv_layer(layer, 24, conv.output_shape, strides=(2, 2))
         nengo.Connection(layer, out, transform=nengo_dl.dists.Glorot())
 
     out_p = nengo.Probe(out)
@@ -145,8 +143,7 @@ with nengo.Network(seed=0) as net:
 
 # set up training data
 minibatch_size = 200
-train_data = {inp: train_data[0][:, None, :],
-              out_p: train_data[1][:, None, :]}
+train_data = {inp: train_data[0][:, None, :], out_p: train_data[1][:, None, :]}
 
 # for the test data evaluation we'll be running the network over time
 # using spiking neurons, so we need to repeat the input/target data
@@ -240,3 +237,4 @@ plt.imshow(allimage, aspect='auto', interpolation='none', cmap='gray')
 plt.subplot(2, 1, 2)
 plt.plot(sim.trange()[:n_plots * step], sim.data[out_p_filt][:n_plots * step])
 plt.legend(['%d' % i for i in range(10)], loc='best');
+plt.show()

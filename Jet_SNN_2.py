@@ -37,11 +37,22 @@ for fileIN in dataset:
     target = np.concatenate([target, mytarget], axis=0) if target.size else mytarget
 print(target.shape, features.shape)
 
+# with gzip.open('mnist.pkl.gz') as f:
+#     train_data, _, test_data = pickle.load(f, encoding="latin1")
+# train_d = list(train_data)
+# test_d = list(test_data)
+# data = []
+# for data in (train_d, test_d):
+#     one_hot = np.zeros((data[0].shape[0], 10))
+#     one_hot[np.arange(data[0].shape[0]), data[1]] = 1
+#     data[1] = one_hot
+
 # splitting the train / test data in ratio 80:20
-train_features = features[:64000]
-train_targets = target[:64000]
-test_features = features[64000:]
-test_targets = target[64000:]
+train_data_num = int(target.shape[0] * 0.8)
+train_features = features[:train_data_num]
+train_targets = target[:train_data_num]
+test_features = features[train_data_num:]
+test_targets = target[train_data_num:]
 
 # creating a train and test dataset
 test_d = []

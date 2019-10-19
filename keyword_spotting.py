@@ -129,6 +129,8 @@ with nengo.Network(label="Keyword spotting") as model:
     model.config[layer_1].on_chip = False
     nengo.Connection(
         inp, layer_1.neurons, transform=params["input_node -> x_c_0"])
+    p1 = nengo.Probe(layer_1.neurons)
+
 
     layer_2 = nengo.Ensemble(n_neurons=n_neurons, dimensions=1,
                              neuron_type=neuron_type,
@@ -138,6 +140,8 @@ with nengo.Network(label="Keyword spotting") as model:
     nengo.Connection(
         layer_1.neurons, layer_2.neurons,
         transform=params["x_c_0 -> x_c_1"])
+    p2 = nengo.Probe(layer_2.neurons)
+
 
     char_synapse = nengo.synapses.Alpha(0.005)
 
@@ -158,6 +162,11 @@ def predict_text(sim, n_steps, p_time):
     n_frames = int(n_steps / p_time)
     char_data = sim.data[char_probe]
     n_chars = char_data.shape[1]
+
+    print("Layer 1 number of spikes: ", (sim.data[p1] > 0).sum(axis=0))
+    print("Layer 1: ", (sim.data[p1]))
+    print("Layer 2 number of spikes: ", (sim.data[p2] > 0).sum(axis=0))
+    print("Layer 2: ", (sim.data[p2]))
 
     # reshape to separate out each window frame that was presented
     char_out = np.reshape(char_data, (n_frames, p_time, n_chars))

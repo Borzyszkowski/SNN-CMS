@@ -180,8 +180,7 @@ with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
         sim.train(train_data, tf.train.RMSPropOptimizer(learning_rate=0.001),
                   objective={out_p: crossentropy}, n_epochs=5)
 
-        print("error after training: %.2f%%" %
-              sim.loss(test_data, {out_p_filt: classification_error}))
+        print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
         sim.save_params("./mnist_params")
     else:
@@ -190,6 +189,7 @@ with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
         download("./mnist_params.index", "1w8GNylkamI-3yHfSe_L1-dBtvaQYjNlC")
         download("./mnist_params.meta", "1JiaoxIqmRupT4reQ5BrstuILQeHNffrX")
         sim.load_params("./mnist_params")
+        print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
     # store trained parameters back into the network
     sim.freeze_params(net)
@@ -211,12 +211,15 @@ with nengo_loihi.Simulator(net, dt=dt, precompute=False) as sim:
     # check classification error
     step = int(presentation_time / dt)
     output = sim.data[out_p_filt][step - 1::step]
+
     correct = 100 * (np.mean(
         np.argmax(output, axis=-1)
         != np.argmax(test_data[out_p_filt][:n_presentations, -1],
                      axis=-1)
     ))
     print("loihi error: %.2f%%" % correct)
+    print("Predicted labels: ", np.argmax(output, axis=-1))
+    print("Correct labels: ", np.argmax(test_data[out_p_filt][:n_presentations, -1], axis=-1))
 
 
 n_plots = 10
@@ -235,3 +238,5 @@ plt.imshow(allimage, aspect='auto', interpolation='none', cmap='gray')
 plt.subplot(2, 1, 2)
 plt.plot(sim.trange()[:n_plots * step], sim.data[out_p_filt][:n_plots * step])
 plt.legend(['%d' % i for i in range(10)], loc='best');
+plt.show()
+

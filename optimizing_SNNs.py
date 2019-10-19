@@ -1,18 +1,18 @@
-
 import gzip
 import pickle
 from urllib.request import urlretrieve
 import zipfile
-import requests
 
 import nengo
-import nengo_dl
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import nengo_loihi
 
+import nengo_dl
 
-urlretrieve("http://deeplearning.net/data/mnist/mnist.pkl.gz", "mnist.pkl.gz")
+urlretrieve("http://deeplearning.net/data/mnist/mnist.pkl.gz",
+            "mnist.pkl.gz")
 with gzip.open("mnist.pkl.gz") as f:
     train_data, _, test_data = pickle.load(f, encoding="latin1")
 train_data = list(train_data)
@@ -24,103 +24,92 @@ for data in (train_data, test_data):
 
 for i in range(3):
     plt.figure()
-    plt.imshow(np.reshape(train_data[0][i], (28, 28)))
+    plt.imshow(np.reshape(train_data[0][i], (28, 28)),
+               cmap="gray")
     plt.axis('off')
     plt.title(str(np.argmax(train_data[1][i])));
 
 
-# lif parameters
-lif_neurons = nengo.LIF(amplitude=0.01)
+with nengo.Network() as net:
+    # set some default parameters for the neurons that will make
+    # the training progress more smoothly
+    net.config[nengo.Ensemble].max_rates = nengo.dists.Choice([100])
+    net.config[nengo.Ensemble].intercepts = nengo.dists.Choice([0])
+    neuron_type = nengo.LIF(amplitude=0.01)
 
-# softlif parameters (lif parameters + sigma)
-softlif_neurons = nengo_dl.SoftLIFRate(amplitude=0.01, sigma=0.001)
+    # we'll make all the nengo objects in the network
+    # non-trainable. we could train them if we wanted, but they don't
+    # add any representational power. note that this doesn't affect
+    # the internal components of tensornodes, which will always be
+    # trainable or non-trainable depending on the code written in
+    # the tensornode.
+    nengo_dl.configure_settings(trainable=False)
 
-# ensemble parameters
-ens_params = dict(max_rates=nengo.dists.Choice([100]), intercepts=nengo.dists.Choice([0]))
+    # the input node that will be used to feed in input images
+    inp = nengo.Node([0] * 28 * 28)
 
-# plot some example LIF tuning curves
-for neuron_type in (lif_neurons, softlif_neurons):
-    with nengo.Network(seed=0) as net:
-        ens = nengo.Ensemble(10, 1, neuron_type=neuron_type)
+    # add the first convolutional layer
+    x = nengo_dl.tensor_layer(
+        inp, tf.layers.conv2d, shape_in=(28, 28, 1), filters=32,
+        kernel_size=3)
 
-    with nengo_dl.Simulator(net) as sim:
-        plt.figure()
-        plt.plot(*nengo.utils.ensemble.tuning_curves(ens, sim))
-        plt.xlabel("input value")
-        plt.ylabel("firing rate")
-        plt.title(str(neuron_type))
+    # apply the neural nonlinearity
+    x = nengo_dl.tensor_layer(x, neuron_type)
 
+    # add another convolutional layer
+    x = nengo_dl.tensor_layer(
+        x, tf.layers.conv2d, shape_in=(26, 26, 32),
+        filters=64, kernel_size=3)
+    x = nengo_dl.tensor_layer(x, neuron_type)
 
+    # add a pooling layer
+    x = nengo_dl.tensor_layer(
+        x, tf.layers.average_pooling2d, shape_in=(24, 24, 64),
+        pool_size=2, strides=2)
 
-def build_network(neuron_type, output_synapse=None):
-    with nengo.Network() as net:
-        # we'll make all the nengo objects in the network
-        # non-trainable. we could train them if we wanted, but they don't
-        # add any representational power so we can save some computation
-        # by ignoring them. note that this doesn't affect the internal
-        # components of tensornodes, which will always be trainable or
-        # non-trainable depending on the code written in the tensornode.
-        nengo_dl.configure_settings(trainable=False)
+    # another convolutional layer
+    x = nengo_dl.tensor_layer(
+        x, tf.layers.conv2d, shape_in=(12, 12, 64),
+        filters=128, kernel_size=3)
+    x = nengo_dl.tensor_layer(x, neuron_type)
 
-        # the input node that will be used to feed in input images
-        inp = nengo.Node([0] * 28 * 28)
+    # another pooling layer
+    x = nengo_dl.tensor_layer(
+        x, tf.layers.average_pooling2d, shape_in=(10, 10, 128),
+        pool_size=2, strides=2)
 
-        # add the first convolutional layer
-        x = nengo_dl.tensor_layer(
-            inp, tf.layers.conv2d, shape_in=(28, 28, 1), filters=32,
-            kernel_size=3)
+    # linear readout
+    x = nengo_dl.tensor_layer(x, tf.layers.dense, units=10)
 
-        # apply the neural nonlinearity
-        x = nengo_dl.tensor_layer(x, neuron_type, **ens_params)
+    # we'll create two different output probes, one with a filter
+    # (for when we're simulating the network over time and
+    # accumulating spikes), and one without (for when we're
+    # training the network using a rate-based approximation)
+    out_p = nengo.Probe(x)
+    out_p_filt = nengo.Probe(x, synapse=0.1)
 
-        # add another convolutional layer
-        x = nengo_dl.tensor_layer(
-            x, tf.layers.conv2d, shape_in=(26, 26, 32),
-            filters=64, kernel_size=3)
-        x = nengo_dl.tensor_layer(x, neuron_type, **ens_params)
-
-        # add a pooling layer
-        x = nengo_dl.tensor_layer(
-            x, tf.layers.average_pooling2d, shape_in=(24, 24, 64),
-            pool_size=2, strides=2)
-
-        # another convolutional layer
-        x = nengo_dl.tensor_layer(
-                x, tf.layers.conv2d, shape_in=(12, 12, 64),
-                filters=128, kernel_size=3)
-        x = nengo_dl.tensor_layer(x, neuron_type, **ens_params)
-
-        # another pooling layer
-        x = nengo_dl.tensor_layer(
-            x, tf.layers.average_pooling2d, shape_in=(10, 10, 128),
-            pool_size=2, strides=2)
-
-        # linear readout
-        x = nengo_dl.tensor_layer(x, tf.layers.dense, units=10)
-
-        p = nengo.Probe(x, synapse=output_synapse)
-
-    return net, inp, p
-
-# construct the network
-net, inp, out_p = build_network(softlif_neurons)
-
-# construct the simulator
 minibatch_size = 200
 sim = nengo_dl.Simulator(net, minibatch_size=minibatch_size)
 
+# add the single timestep to the training data
+train_data = {inp: train_data[0][:, None, :],
+              out_p: train_data[1][:, None, :]}
 
-# note that we need to add the time dimension (axis 1), which has length 1
-# in this case. we're also going to reduce the number of test images, just to
-# speed up this example.
-train_inputs = {inp: train_data[0][:, None, :]}
-train_targets = {out_p: train_data[1][:, None, :]}
-test_inputs = {inp: test_data[0][:minibatch_size*2, None, :]}
-test_targets = {out_p: test_data[1][:minibatch_size*2, None, :]}
+# when testing our network with spiking neurons we will need to run it
+# over time, so we repeat the input/target data for a number of
+# timesteps. we're also going to reduce the number of test images, just
+# to speed up this example.
+n_steps = 30
+test_data = {
+    inp: np.tile(test_data[0][:minibatch_size*2, None, :],
+                 (1, n_steps, 1)),
+    out_p_filt: np.tile(test_data[1][:minibatch_size*2, None, :],
+                        (1, n_steps, 1))}
 
 
-def objective(x, y):
-    return tf.nn.softmax_cross_entropy_with_logits_v2(logits=x, labels=y)
+def objective(outputs, targets):
+    return tf.nn.softmax_cross_entropy_with_logits_v2(
+        logits=outputs, labels=targets)
 
 
 opt = tf.train.RMSPropOptimizer(learning_rate=0.001)
@@ -133,57 +122,59 @@ def classification_error(outputs, targets):
                 tf.float32))
 
 
-# print("error before training: %.2f%%" % sim.loss(test_inputs, test_targets,
-#                                                  classification_error))
+"""do_training = True
+with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
+    if do_training:
+        print("error before training: %.2f%%" % sim.loss(
+            test_data, {out_p_filt: classification_error}))
+        # run training
+        sim.train(train_data, opt, objective={out_p: objective}, n_epochs=10)
 
-do_training = False
-if do_training:
-    # run training
-    sim.train(train_inputs, train_targets, opt, objective=objective, n_epochs=10)
+        print("error after training: %.2f%%" % sim.loss(test_data, {out_p_filt: classification_error}))
 
-    # save the parameters to file
-    sim.save_params("./mnist_params")
-else:
-    # download pretrained weights
-    urlretrieve(
-        "https://drive.google.com/uc?export=download&id=1tNdnMPotIk8N0_rdv0XaL24dYqMGC2iM",
-        "mnist_params.zip")
-    with zipfile.ZipFile("mnist_params.zip") as f:
-        f.extractall()
+        sim.save_params("./jet_params")
+    else:
+        # download pretrained weights
+        urlretrieve(
+            "https://drive.google.com/uc?export=download&"
+            "id=1u9JyNuRxQDUcFgkRnI1qfJVFMdnGRsjI",
+            "mnist_params.zip")
+        with zipfile.ZipFile("mnist_params.zip") as f:
+            f.extractall()
+        print('downloaded')
+        sim.load_params("./mnist_params")
 
-    # load parameters
-    sim.load_params("./mnist_params")
-
-print("error after training: %.2f%%" % sim.loss(test_inputs, test_targets,
-                                                classification_error))
-
-sim.close()
-
-
-net, inp, out_p = build_network(lif_neurons, output_synapse=0.1)
-
-sim = nengo_dl.Simulator(net, minibatch_size=minibatch_size, unroll_simulation=10)
-sim.load_params("./mnist_params")
-
-n_steps = 30
-test_inputs_time = {inp: np.tile(v, (1, n_steps, 1)) for v in test_inputs.values()}
-test_targets_time = {out_p: np.tile(v, (1, n_steps, 1)) for v in test_targets.values()}
-
-print("spiking neuron error: %.2f%%" % sim.loss(test_inputs_time, test_targets_time,
-                                                classification_error))
-
-sim.run_steps(n_steps, input_feeds={inp: test_inputs_time[inp][:minibatch_size]})
-
-for i in range(5):
-    plt.figure()
-    plt.subplot(1, 2, 1)
-    plt.imshow(np.reshape(test_data[0][i], (28, 28)))
-    plt.axis('off')
-
-    plt.subplot(1, 2, 2)
-    plt.plot(sim.trange(), sim.data[out_p][i])
-    plt.legend([str(i) for i in range(10)], loc="upper left")
-    plt.xlabel("time")
+    # store trained parameters back into the network
+    sim.freeze_params(net)"""
 
 
-sim.close()
+for conn in net.all_connections:
+    conn.synapse = 0.005
+
+
+dt = 0.001  # simulation timestep
+presentation_time = 0.1  # input presentation time
+max_rate = 100  # neuron firing rates
+# neuron spike amplitude (scaled so that the overall output is ~1)
+amp = 1 / max_rate
+# input image shape
+n_parallel = 2  # number of parallel network repetitions
+
+n_presentations = 50
+with nengo_loihi.Simulator(net, dt=dt, precompute=False) as sim:
+    # if running on Loihi, increase the max input spikes per step
+    if 'loihi' in sim.sims:
+        sim.sims['loihi'].snip_max_spikes_per_step = 120
+
+    # run the simulation on Loihi
+    sim.run(n_presentations * presentation_time)
+
+    # check classification error
+    step = int(presentation_time / dt)
+    output = sim.data[out_p_filt][step - 1::step]
+    correct = 100 * (np.mean(
+        np.argmax(output, axis=-1)
+        != np.argmax(test_data[out_p_filt][:n_presentations, -1],
+                     axis=-1)
+    ))
+    print("loihi error: %.2f%%" % correct)

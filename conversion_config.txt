@@ -9,8 +9,8 @@ evaluate_ann = True
 normalize = False
 
 [simulation]
-simulator = brian2
-num_to_test = 50
+simulator = INI
+num_to_test = 300
 batch_size = 1
 keras_backend = tensorflow
 

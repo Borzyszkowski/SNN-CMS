@@ -52,11 +52,11 @@ model = keras.Sequential([
                        name='softmax')
 ])
 
+model.summary()
 model.compile(optimizer=tf.train.AdamOptimizer(),
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 model.fit(train_images, train_labels, epochs=5);
-
 
 model_weights = "keras_weights.h5"
 model.save_weights(model_weights)
