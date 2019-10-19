@@ -4,9 +4,11 @@ Simulation or deployment of Spiking Neural Network for inference on the Loihi ch
 ### How to run?
 
 #### Simulation
-Classification of Jets using SNNs from the natural representation with 16 features:
 >~~~~
 >pip install -r requirements.txt
+>~~~~
+Classification of Jets using SNNs from the natural representation with 16 features:
+>~~~~
 >python Jet_SNN_model.py
 >~~~~
 
