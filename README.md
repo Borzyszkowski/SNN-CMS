@@ -18,7 +18,7 @@ To execute code on the remote Loihi Superhost please configure your machine usin
 ### Usefull links
 
 * [hls4ML](https://hls-fpga-machine-learning.github.io/hls4ml/) - Firmware implementations of machine learning algorithms using high level synthesis language (HLS)
-* [Nengo Loihi](https://www.nengo.ai/nengo-loihi/overview.html) - Nengo Loihi is a Python package for running Nengo models on Loihi boards. It contains a Loihi emulator backend for rapid model development and easier debugging, and a Loihi hardware backend for running models on a Loihi board.
+* [Nengo Loihi](https://www.nengo.ai/nengo-loihi/overview.html) - Nengo Loihi is a Python package for running Nengo models on Loihi boards
 * [Loihi chip overview](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8259423) - Loihi: A Neuromorphic
 Manycore Processor with
 On-Chip Learning
