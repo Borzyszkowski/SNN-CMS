@@ -1,2 +1,0 @@
-model_checkpoint_path: "jet_file.ckpt"
-all_model_checkpoint_paths: "jet_file.ckpt"
