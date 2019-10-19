@@ -40,17 +40,6 @@ for fileIN in dataset:
 print(target.shape, features.shape)
 class_names = np.array(['g', 'q', 'w', 'z', 't'], dtype=str)
 
-
-# with gzip.open('mnist.pkl.gz') as f:
-#     train_data, _, test_data = pickle.load(f, encoding="latin1")
-# train_d = list(train_data)
-# test_d = list(test_data)
-# data = []
-# for data in (train_d, test_d):
-#     one_hot = np.zeros((data[0].shape[0], 10))
-#     one_hot[np.arange(data[0].shape[0]), data[1]] = 1
-#     data[1] = one_hot
-
 # splitting the train / test data in ratio 80:20
 train_data_num = int(target.shape[0] * 0.8)
 train_features = features[:train_data_num]
@@ -80,12 +69,12 @@ with nengo.Network(label="Jet classification") as model:
     model.config[nengo.Ensemble].max_rates = nengo.dists.Choice([max_rate])
     model.config[nengo.Ensemble].intercepts = nengo.dists.Choice([0])
 
+    """ Choose a type of spiking neuron """
     neuron_type = nengo.SpikingRectifiedLinear(amplitude=amplitude)
     # neuron_type = nengo.LIF(tau_rc=0.02, tau_ref=0.001, amplitude=amplitude)
     # neuron_type = nengo.AdaptiveLIF(amplitude=amplitude)
     # neuron_type = nengo.Izhikevich()
 
-    # inp = nengo.Node(np.zeros(n_inputs), label="in")
     inp = nengo.Node(nengo.processes.PresentInput(test_d[0], presentation_time), size_out=16)
 
     out = nengo.Node(size_in=n_outputs)
@@ -163,7 +152,7 @@ step = int(presentation_time / dt)
 presentation_time = 0.1  # input presentation time
 train_data = {inp: train_d[0][:, None, :], out_p: train_d[1][:, None, :]}
 
-# for the test data evaluation we'll be running the network over time
+# for the test data evaluation we will be running the network over time
 # using spiking neurons, so we need to repeat the input/target data
 # for a number of timesteps (based on the presentation_time)
 minibatch_size = 200
