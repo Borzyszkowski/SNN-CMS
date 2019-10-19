@@ -1,7 +1,11 @@
-snntoolbox
 h5py
 numpy
 matplotlib
 sklearn
 tensorflow
 keras
+gzip-reader
+nengo
+nengo_dl
+nengo_loihi
+nengo_extras
