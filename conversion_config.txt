@@ -10,7 +10,7 @@ normalize = False
 
 [simulation]
 simulator = INI
-num_to_test = 10
+num_to_test = 300
 batch_size = 1
 keras_backend = tensorflow
 
