@@ -22,12 +22,12 @@ To execute code on the remote Loihi Superhost please configure your machine usin
 
 Classification of particles using fully-connected SNNs from the natural representation of Jets with 16 features:
 >~~~~
->SLURM python3 Jet_DenseSNN_model.py
+>SLURM=1 python3 Jet_DenseSNN_model.py
 >~~~~
 
 Classification of particles on the images with convolutional SNNs:
 >~~~~
->SLURM python3 Jet_ConvSNN_model.py
+>SLURM=1 python3 Jet_ConvSNN_model.py
 >~~~~
 
 ### Useful links
