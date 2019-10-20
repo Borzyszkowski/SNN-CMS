@@ -6,32 +6,32 @@ Experiments with different SNN models to solve various problems using Nengo and 
 >pip install -r requirements.txt
 >~~~~
 
-#### Spiking MNIST
+#### - Spiking MNIST
  `python Nengo_MNIST_Train.py`
  
 inspired by https://www.nengo.ai/nengo-loihi/examples/mnist_convnet.html
 
-#### Optimizing Spiking MNIST
+#### - Optimizing Spiking MNIST
  `python Optimizing_SNNs.py`
  
 inspired by https://www.nengo.ai/nengo-dl/examples/spiking-mnist.html
 
-#### Spiking Keyword spotting task
+#### - Spiking Keyword spotting task
  `python Nengo_keyword_spotting.py`
  
 inspired by https://www.nengo.ai/nengo-loihi/examples/keyword_spotting.html
 
-#### Spiking CIFAR 10 classification
+#### - Spiking CIFAR 10 classification
  `python Nengo_cif10_conv.py`
  
 inspired by https://www.nengo.ai/nengo-extras/examples/cuda_convnet/cifar10_spiking_cnn.html
 
-#### Spiking Communication channel
+#### - Spiking Communication channel
  `python Nengo_communication_channel.py`
  
 inspired by https://www.nengo.ai/nengo-loihi/examples/communication_channel.html
 
-#### Nengo Fashion MNIST
+#### - Nengo Fashion MNIST
 Inserting a Tensorflow / Keras network into the Nengo framework.
 
 `python Nengo_fashion_mnist.py`
