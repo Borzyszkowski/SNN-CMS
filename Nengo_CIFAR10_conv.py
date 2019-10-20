@@ -5,15 +5,8 @@ import tempfile
 
 import matplotlib.pyplot as plt
 import nengo
-from nengo.utils.compat import is_iterable
 import nengo_dl
-from nengo_dl import SoftLIFRate
-from nengo_extras.data import load_cifar10, one_hot_from_labels
-import nengo_loihi
-from nengo_loihi.conv import (
-    Conv2D, ImageSlice, ImageShape, split_transform)
-import numpy as np
-import tensorflow as tf
+
 
 if nengo.__version__ != '2.8.0':
     nengo_version = nengo.__version__
@@ -26,6 +19,16 @@ if tuple(nengo_dl.__version__.split('.')[:3]) != ('1', '2', '1'):
     nengo_dl = None
     raise ImportError("nengo_dl version is not correct (must be 1.2.1, got %s)"
                       % nengo_dl_version)
+
+
+from nengo_dl import SoftLIFRate
+from nengo.utils.compat import is_iterable
+from nengo_extras.data import load_cifar10, one_hot_from_labels
+import nengo_loihi
+from nengo_loihi.conv import (
+    Conv2D, ImageSlice, ImageShape, split_transform)
+import numpy as np
+import tensorflow as tf
 
 
 class TfConv2d(object):
