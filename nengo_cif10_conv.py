@@ -654,6 +654,7 @@ if allimage.shape[-1] == 1:
 allimage = (allimage - X_min) / (X_max - X_min)
 plt.imshow(allimage, aspect='auto', interpolation='none', cmap='gray')
 
+
 plt.subplot(2, 1, 2)
 t = sim.trange()
 plt.plot(t, sim.data[out_p])

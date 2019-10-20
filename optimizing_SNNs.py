@@ -122,7 +122,7 @@ def classification_error(outputs, targets):
                 tf.float32))
 
 
-"""do_training = True
+do_training = True
 with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
     if do_training:
         print("error before training: %.2f%%" % sim.loss(
@@ -145,7 +145,7 @@ with nengo_dl.Simulator(net, minibatch_size=minibatch_size, seed=0) as sim:
         sim.load_params("./mnist_params")
 
     # store trained parameters back into the network
-    sim.freeze_params(net)"""
+    sim.freeze_params(net)
 
 
 for conn in net.all_connections:
