@@ -24,7 +24,7 @@ inspired by https://www.nengo.ai/nengo-dl/examples/spiking-mnist.html
 inspired by https://www.nengo.ai/nengo-loihi/examples/keyword_spotting.html
 
 #### - Spiking CIFAR 10 classification
- `python Nengo_cif10_conv.py`
+ `python Nengo_CIFAR10_conv.py`
  
 inspired by https://www.nengo.ai/nengo-extras/examples/cuda_convnet/cifar10_spiking_cnn.html
 
@@ -36,7 +36,7 @@ inspired by https://www.nengo.ai/nengo-loihi/examples/communication_channel.html
 #### - Nengo Fashion MNIST
 Inserting a Tensorflow / Keras network into the Nengo framework.
 
-`python Nengo_fashion_mnist.py`
+`python Nengo_fashion_MNIST.py`
  
 inspired by https://www.nengo.ai/nengo-dl/v2.2.0/examples/tensorflow-models.html
 
