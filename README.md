@@ -20,7 +20,7 @@ inspired by https://www.nengo.ai/nengo-dl/examples/spiking-mnist.html
 
 #### Spiking Keyword spotting task
 >~~~~
->python Nengo_keyword_spotting
+>python Nengo_keyword_spotting.py
 >~~~~
 inspired by https://www.nengo.ai/nengo-loihi/examples/keyword_spotting.html
 
@@ -28,6 +28,7 @@ inspired by https://www.nengo.ai/nengo-loihi/examples/keyword_spotting.html
 >~~~~
 >python Nengo_cif10_conv.py
 >~~~~
+inspired by https://www.nengo.ai/nengo-extras/examples/cuda_convnet/cifar10_spiking_cnn.html
 
 #### Spiking Communication channel
 >~~~~
