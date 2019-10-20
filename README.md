@@ -15,7 +15,7 @@ This project is investigating the potential of Spiking neural networks deployed 
 >git clone https://github.com/Borzyszkowski/SNN-CMS.git
 >~~~~
 
-##### Jet Tagging - Simulation with SNN Toolbox:
+##### Jet Tagging - Simulation with SNNToolbox:
 >~~~~
 >git checkout SNNToolbox_model
 >~~~~
