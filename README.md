@@ -10,5 +10,9 @@ Simulation of Spiking Neural Networks in SNNToolbox to solve the Jet Tagging Pro
 
 ### Useful links
 
-* [hls4ML](https://hls-fpga-machine-learning.github.io/hls4ml/) - Firmware implementations of machine learning algorithms using high level synthesis language (HLS)
-* [SNNtoolbox](https://snntoolbox.readthedocs.io/en/latest/index.html) - Conversion toolbox containing functions to transform rate-based artificial neural networks into spiking neural networks, and to simulate them
+* For more information visit the webpage: https://hls-fpga-machine-learning.github.io/hls4ml/
+* Presentation about the project at CERN is available [here](https://indico.cern.ch/event/830003/contributions/3523519/?fbclid=IwAR0hQG6KLb1oqnAyZy_GtXAGA23O4FtIIORfAUUhWlLxHRuarscMi1Bmfyc).
+* Learn more about [Loihi: A Neuromorphic
+Manycore Processor with
+On-Chip Learning](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8259423).
+* [SNNs overview](https://www.frontiersin.org/articles/10.3389/fnins.2018.00774/full) - Deep Learning With Spiking Neurons: Opportunities and Challenges
