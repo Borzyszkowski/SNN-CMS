@@ -16,7 +16,7 @@ inspired by https://www.nengo.ai/nengo-loihi/examples/mnist_convnet.html
  
 inspired by https://www.nengo.ai/nengo-dl/examples/spiking-mnist.html
 
-#### - Spiking Keyword spotting task
+#### - Spiking Keyword Spotting Task
  `python Nengo_keyword_spotting.py`
  
 inspired by https://www.nengo.ai/nengo-loihi/examples/keyword_spotting.html
@@ -26,7 +26,7 @@ inspired by https://www.nengo.ai/nengo-loihi/examples/keyword_spotting.html
  
 inspired by https://www.nengo.ai/nengo-extras/examples/cuda_convnet/cifar10_spiking_cnn.html
 
-#### - Spiking Communication channel
+#### - Spiking Communication Channel
  `python Nengo_communication_channel.py`
  
 inspired by https://www.nengo.ai/nengo-loihi/examples/communication_channel.html
