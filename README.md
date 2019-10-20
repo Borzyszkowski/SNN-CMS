@@ -48,5 +48,4 @@ inspired by https://www.nengo.ai/nengo-dl/v2.2.0/examples/tensorflow-models.html
 * Learn more about [Loihi: A Neuromorphic
 Manycore Processor with
 On-Chip Learning](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8259423).
-
 * [SNNs overview](https://www.frontiersin.org/articles/10.3389/fnins.2018.00774/full) - Deep Learning With Spiking Neurons: Opportunities and Challenges
