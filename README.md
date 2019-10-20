@@ -7,9 +7,8 @@ Experiments with different SNN models to solve various problems using Nengo and 
 >~~~~
 
 #### Spiking MNIST
->~~~~
->python Nengo_MNIST_Train.py
->~~~~
+ `python Nengo_MNIST_Train.py`
+ 
 inspired by https://www.nengo.ai/nengo-loihi/examples/mnist_convnet.html
 
 #### Optimizing Spiking MNIST
