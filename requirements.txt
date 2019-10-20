@@ -1,7 +1,9 @@
-snntoolbox
-h5py
+pillow
 numpy
 matplotlib
-sklearn
+nengo
+nengo_dl
+nengo_loihi
+nengo_extras
 tensorflow
 keras
