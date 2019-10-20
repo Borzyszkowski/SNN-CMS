@@ -10,14 +10,10 @@ Simulation or deployment of Spiking Neural Networks for inference on the Loihi c
 To execute code on the remote Loihi Superhost please configure your machine using following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After succesfull installation run the code on the Superhost adding `SLURM=1` to the command.
 
 Classification of particles using fully-connected SNNs from the natural representation of Jets with 16 features:
->~~~~
->python Jet_DenseSNN_model.py
->~~~~
+`python Jet_DenseSNN_model.py`
 
 Classification of particles on the images with convolutional SNNs:
->~~~~
->python Jet_ConvSNN_model.py
->~~~~
+`python Jet_ConvSNN_model.py`
 
 
 ### Useful links
