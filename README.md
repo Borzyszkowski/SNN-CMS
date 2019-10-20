@@ -6,7 +6,7 @@ Experiments with different SNN models to solve various problems using Nengo and 
 >pip install -r requirements.txt
 >~~~~
 
-To execute code on the remote Loihi Superhost please configure your machine using following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After succesfull installation run the code on Superhost adding `SLURM=1` to the command.
+To execute code on the remote Loihi Superhost please configure your machine using the following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After a succesfull installation run the code on Superhost by adding `SLURM=1` to the command.
 
 #### - Spiking MNIST
  `python Nengo_MNIST_Train.py`
