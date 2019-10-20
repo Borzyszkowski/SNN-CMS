@@ -9,12 +9,12 @@ Simulation or deployment of Spiking Neural Networks for inference on the Loihi c
 >~~~~
 Classification of particles using fully-connected SNNs from the natural representation of Jets with 16 features:
 >~~~~
->python Jet_SNN_model.py
+>python Jet_DenseSNN_model.py
 >~~~~
 
 Classification of particles on the images with convolutional SNNs:
 >~~~~
->python Jet_ConvSNN.py
+>python Jet_ConvSNN_model.py
 >~~~~
 
 #### On-chip inference
@@ -22,12 +22,12 @@ To execute code on the remote Loihi Superhost please configure your machine usin
 
 Classification of particles using fully-connected SNNs from the natural representation of Jets with 16 features:
 >~~~~
->SLURM python3 Jet_SNN_model.py
+>SLURM python3 Jet_DenseSNN_model.py
 >~~~~
 
 Classification of particles on the images with convolutional SNNs:
 >~~~~
->SLURM python3 Jet_ConvSNN.py
+>SLURM python3 Jet_ConvSNN_model.py
 >~~~~
 
 ### Useful links
