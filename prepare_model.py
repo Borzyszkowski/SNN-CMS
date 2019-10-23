@@ -54,9 +54,6 @@ def make_model(files, json_file, h5_file):
     # Add an op to initialize the variables.
     init_op = tf.global_variables_initializer()
 
-    # Add ops to save and restore all the variables.
-
-
     inputArray = Input(shape=(input_shape,))
     x = Dense(64, activation='relu')(inputArray)
     x = Dropout(0.25)(x)
