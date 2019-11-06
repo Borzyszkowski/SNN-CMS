@@ -8,7 +8,7 @@ from keras.layers import Dense, Input, Dropout
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
 from sklearn.model_selection import train_test_split
 
-from Inputs_to_h5 import gen_h5
+from inputs_to_h5 import gen_h5
 import glob
 import tensorflow as tf
 
