@@ -9,10 +9,32 @@ evaluate_ann = True
 normalize = False
 
 [simulation]
+duration = 200
+dt = 1
 simulator = INI
-num_to_test = 1000
-batch_size = 200
+num_to_test = 10000
+batch_size = 1000reset_between_nth_sample = 1
 keras_backend = tensorflow
+
+[cell]
+v_thresh = 4
+tau_refrac = 0
+v_reset = 1
+v_rest = 1
+e_rev_e = 10
+e_rev_i = -10
+i_offset = 0
+cm = 0.09
+tau_m = 1000
+tau_syn_e = 0.01
+tau_syn_i = 0.01
+delay = 1
+binarize_weights = False
+quantize_weights = False
+scaling_factor = 10000000
+payloads = False
+reset = Reset by subtraction
+leak = False
 
 [input]
 model_lib = keras
