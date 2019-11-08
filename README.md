@@ -7,7 +7,7 @@ Simulation and deployment of Spiking Neural Networks for inference on the Loihi 
 >pip install -r requirements.txt
 >~~~~
 
-To execute code on the remote Loihi Superhost please configure your machine using the following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After a succesfull installation run the code on Superhost by adding `SLURM=1` to the command.
+An access to Intel Neuromorphic Research Community is required to run jobs on the chip. Otherwise, a simulation mode will be entered by default. To execute code on the remote Loihi Superhost please configure your machine using the following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After a succesfull installation execute the code on Superhost by adding `SLURM=1` to the command.
 
 Classification of particles using fully-connected SNNs from the natural representation of Jets with 16 features:
 
