@@ -1,4 +1,5 @@
 <p align="center"><img src="https://openlab.cern/sites/openlab.web.cern.ch/files/LOGO_CERN_openlab_0.png" width="300" align="middle"></p>
+<br>
 
 # SNN-CMS
 Neuromorphic computing (Spiking Neural Networks) with utilization of Loihi chips in LHC experiments, CMS detector.
