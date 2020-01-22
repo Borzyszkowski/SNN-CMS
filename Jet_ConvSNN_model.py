@@ -45,11 +45,7 @@ class_names = np.array(['g', 'q', 'w', 'z', 't'], dtype=str)
 
 
 # splitting the train / test data in ratio 80:20
-train_data_num = int(target.shape[0] * 0.8)
-train_features = features[:train_data_num]
-train_targets = target[:train_data_num]
-test_features = features[train_data_num:]
-test_targets = target[train_data_num:]
+train_features, test_features, train_targets, test_targets = train_test_split(features, target, test_size=0.2)
 
 # creating a train and test dataset
 test_d = []
