@@ -1,0 +1,36 @@
+[paths]
+path_wd = .
+dataset_path = .
+filename_ann = model2SNN
+runlabel = test
+
+[tools]
+evaluate_ann = True
+parse = True
+normalize = False
+
+[simulation]
+simulator = loihi
+duration = 3000
+num_to_test = 10
+batch_size = 1
+keras_backend = tensorflow
+
+[loihi]
+partition = loihi
+save_output = True
+use_reset_snip = True
+do_overflow_estimate = True
+normalize_thresholds = True
+desired_threshold_to_input_ratio = 128
+compartment_kwargs = {'biasExp': 6, 'vThMant': 512}
+connection_kwargs = {'numWeightBits': 8, 'weightExponent': 0}
+
+[output]
+log_vars = {'all'}
+plot_vars = {'all'}
+
+[input]
+model_lib = keras
+dataset_format = npz
+

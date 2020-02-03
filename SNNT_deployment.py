@@ -1,4 +1,4 @@
-""" Script to run Jet Tagging Task on Loihi, using SNN toolbox """
+""" Script to train and run a neural network on Loihi to solve Jet Tagging Task, using SNN toolbox """
 
 import configparser
 from snntoolbox.bin.run import main
@@ -151,7 +151,7 @@ def create_config():
         'dataset_format': 'npz'
     }
 
-    config_path = 'conversion_config'
+    config_path = 'conversion_config_loihi.txt'
     with open(config_path, 'w') as configfile:
         config.write(configfile)
 
