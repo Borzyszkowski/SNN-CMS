@@ -49,13 +49,7 @@ def make_model(files, json_file, h5_file):
 
     # creating the model
     input_shape = x_train.shape[1]
-    print(input_shape)
-
-    # Add an op to initialize the variables.
-    init_op = tf.global_variables_initializer()
-
-    # Add ops to save and restore all the variables.
-
+    print('input_shape: ', input_shape)
 
     inputArray = Input(shape=(input_shape,))
     x = Dense(64, activation='relu')(inputArray)
@@ -78,30 +72,27 @@ def make_model(files, json_file, h5_file):
     batch_size = 128
     n_epochs = 50
 
-    saver = tf.train.Saver()
-    with tf.Session() as sess:
-        sess.run(init_op)
-        # training the model
-        history = model.fit(x_train, y_train, epochs=n_epochs, batch_size=batch_size, verbose=2,
-                            validation_data=(x_val, y_val),
-                            callbacks=[EarlyStopping(monitor='val_loss', patience=10, verbose=1),
-                                       ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=2, verbose=1),
-                                       TerminateOnNaN()])
+    # training the model
+    history = model.fit(x_train, y_train, epochs=n_epochs, batch_size=batch_size, verbose=2,
+                        validation_data=(x_val, y_val),
+                        callbacks=[EarlyStopping(monitor='val_loss', patience=10, verbose=1),
+                                   ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=2, verbose=1),
+                                   TerminateOnNaN()])
 
-        # visualizing the history
-        plt.plot(history.history['loss'])
-        plt.plot(history.history['val_loss'])
-        plt.yscale('log')
-        plt.title('Training History')
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        plt.legend(['training', 'validation'], loc='upper right')
-        plt.savefig('ANN_training.png')
-        plt.show()
-        model.save_weights(h5_file)
-        print("h5 weight file saved")
-        saver.save(sess, "./model_files/jet_file.ckpt")
-        print('model files saved: meta, index and data')
+    # visualizing the history
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.yscale('log')
+    plt.title('Training History')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['training', 'validation'], loc='upper right')
+    plt.savefig('ANN_training.png')
+    plt.show()
+    model.save_weights(h5_file)
+    print("h5 weight file saved")
+    model.save_weights("./model_files/jet_file.ckpt")
+    print('model files saved: meta, index and data')
 
 
 if __name__ == "__main__":
