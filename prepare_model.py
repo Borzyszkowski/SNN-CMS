@@ -1,4 +1,4 @@
-""" Trains the model and saves it to the json format with weights in h5 format. """
+""" Trains and exports the DNN for Jet Tagging Task. """
 
 import h5py
 import numpy as np
@@ -7,10 +7,7 @@ from keras.models import Model
 from keras.layers import Dense, Input, Dropout
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
 from sklearn.model_selection import train_test_split
-
-from inputs_to_h5 import gen_h5
 import glob
-import tensorflow as tf
 
 # give paths to the dataset folder and json + h5 files
 data_path = './dataset'
@@ -84,17 +81,20 @@ def make_model(files, json_file, h5_file):
     plt.legend(['training', 'validation'], loc='upper right')
     plt.savefig('ANN_training.png')
     plt.show()
-    model.save_weights(h5_file)
-    print("h5 weight file saved")
+
+    # save model with weights and optimizer
+    model.save('model2SNN.h5')
+    print('model exported')
+
+    # save weights
     model.save_weights("./model_files/jet_file.ckpt")
-    print('model files saved: meta, index and data')
+
+    # save model
     model_json = model.to_json()
     with open(json_file, "w") as jf:
         jf.write(model_json)
-    print("json model saved")
 
 
 if __name__ == "__main__":
     data = load_data(data_path)
     make_model(data, json_path, h5_path)
-    gen_h5(json_path, h5_path)
