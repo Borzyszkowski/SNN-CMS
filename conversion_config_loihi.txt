@@ -1,6 +1,6 @@
 [paths]
 path_wd = .
-dataset_path = ./data_path
+dataset_path = ./dataset
 runlabel = test
 filename_ann = model2SNN
 

@@ -151,7 +151,7 @@ def create_config():
         'dataset_format': 'npz'
     }
 
-    config_path = 'conversion_config_loihi.txt'
+    config_path = 'conversion_config_loihi'
     with open(config_path, 'w') as configfile:
         config.write(configfile)
 
