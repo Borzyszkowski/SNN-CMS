@@ -88,7 +88,7 @@ def make_model(files, json_file, h5_file):
     print('model exported')
 
     # save weights
-    model.save_weights("./model_files/jet_file.ckpt")
+    model.save_weights("./jet_file.ckpt")
 
     # save model
     model_json = model.to_json()
