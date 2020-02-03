@@ -1,8 +1,6 @@
 """ Script to train and run a neural network on Loihi to solve Jet Tagging Task, using SNN toolbox """
 
-import configparser
 from snntoolbox.bin.run import main
-import os
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,10 +10,10 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
 from sklearn.model_selection import train_test_split
 import glob
 
-# give paths to the dataset folder and json + h5 files
 data_path = './dataset'
 json_path = "model.json"
 h5_path = "weights.h5"
+config_filepath = 'conversion_config_loihi'
 
 
 def load_data(data_folder):
@@ -98,68 +96,7 @@ def make_model(files, json_file, h5_file):
         jf.write(model_json)
 
 
-def create_config():
-    config = configparser.ConfigParser()
-
-    config['paths'] = {
-        'path_wd': '.',                 # Path to model.
-        'dataset_path': data_path,      # Path to dataset.
-        'filename_ann': 'model2SNN',    # Name of input model.
-        'runlabel': 'test'
-    }
-
-    config['tools'] = {
-        'evaluate_ann': True,           # Test ANN on dataset before conversion.
-        'parse': True,                  # Parses input model.
-        'normalize': False              # Not needed for Loihi backend.
-    }
-
-    config['simulation'] = {
-        'simulator': 'loihi',           # Chooses execution backend of SNN toolbox.
-        'duration': 3000,               # Number of time steps to run each sample.
-        'num_to_test': 10,              # How many samples to run.
-        'batch_size': 1,                # Batch size 1 is the only supported value.
-        'keras_backend': 'tensorflow'}
-
-    config['loihi'] = {
-        # Set partition to run on (optional).
-        'partition': os.environ.get('PARTITION', 'loihi'),
-        # Save plots about resource utilization.
-        'save_output': True,
-        # Accelerate reset between samples.
-        'use_reset_snip': True,
-        # Estimate overflow of dendritic accumulator.
-        'do_overflow_estimate': True,
-        # Tune thresholds to optimal dynamic range.
-        'normalize_thresholds': True,
-        # Hyperparameter for threshold normalization. Defines margin between
-        # threshold and maximum net input to a neuron. Larger ratio -> lower
-        # quantization error, but higher runtime needed.
-        'desired_threshold_to_input_ratio': 2**7,
-        # For DNNs it is recommended to set the biasExp = 6 and weightExponent = 0.
-        'compartment_kwargs': {'biasExp': 6, 'vThMant': 2 ** 9},
-        'connection_kwargs': {'numWeightBits': 8, 'weightExponent': 0}
-    }
-
-    config['output'] = {
-        'log_vars': {'all'},
-        'plot_vars': {'all'}
-    }
-
-    config['input'] = {
-        'model_lib': 'keras',
-        'dataset_format': 'npz'
-    }
-
-    config_path = 'conversion_config_loihi'
-    with open(config_path, 'w') as configfile:
-        config.write(configfile)
-
-    return config_path
-
-
 if __name__ == "__main__":
     data = load_data(data_path)
     make_model(data, json_path, h5_path)
-    config_filepath = create_config()
     main(config_filepath)
