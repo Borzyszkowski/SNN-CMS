@@ -13,7 +13,7 @@ import glob
 data_path = './dataset'
 json_path = "model.json"
 h5_path = "weights.h5"
-config_filepath = 'conversion_config_loihi'
+config_filepath = 'conversion_config_loihi.txt'
 
 
 def load_data(data_folder):
