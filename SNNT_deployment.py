@@ -1,26 +1,19 @@
 """ Script to run Jet Tagging Task on Loihi, using SNN toolbox """
 
-import os
-import time
 import configparser
-import numpy as np
-import pathlib
-import h5py
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-
-import keras
-import tensorflow as tf
-from keras import Input, Model
-from keras.layers import Conv2D, AveragePooling2D, Flatten, Dense, Input, Dropout
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
-
-from keras.datasets import mnist
-from keras.utils import np_utils
 from snntoolbox.bin.run import main
+
+import h5py
+import numpy as np
+import matplotlib.pyplot as plt
+from keras.models import Model
+from keras.layers import Dense, Input, Dropout
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
+from sklearn.model_selection import train_test_split
 
 from inputs_to_h5 import gen_h5
 import glob
+import tensorflow as tf
 
 # give paths to the dataset folder and json + h5 files
 data_path = './dataset'
@@ -133,25 +126,25 @@ def create_config():
         'batch_size': 1,                # Batch size 1 is the only supported value.
         'keras_backend': 'tensorflow'}
 
-    config['loihi'] = {
-        # Set partition to run on (optional).
-        'partition': os.environ.get('PARTITION', 'loihi'),
-        # Save plots about resource utilization.
-        'save_output': True,
-        # Accelerate reset between samples.
-        'use_reset_snip': True,
-        # Estimate overflow of dendritic accumulator.
-        'do_overflow_estimate': True,
-        # Tune thresholds to optimal dynamic range.
-        'normalize_thresholds': True,
-        # Hyperparameter for threshold normalization. Defines margin between
-        # threshold and maximum net input to a neuron. Larger ratio -> lower
-        # quantization error, but higher runtime needed.
-        'desired_threshold_to_input_ratio': 2**7,
-        # For DNNs it is recommended to set the biasExp = 6 and weightExponent = 0.
-        'compartment_kwargs': {'biasExp': 6, 'vThMant': 2 ** 9},
-        'connection_kwargs': {'numWeightBits': 8, 'weightExponent': 0}
-    }
+    # config['loihi'] = {
+    #     # Set partition to run on (optional).
+    #     'partition': os.environ.get('PARTITION', 'loihi'),
+    #     # Save plots about resource utilization.
+    #     'save_output': True,
+    #     # Accelerate reset between samples.
+    #     'use_reset_snip': True,
+    #     # Estimate overflow of dendritic accumulator.
+    #     'do_overflow_estimate': True,
+    #     # Tune thresholds to optimal dynamic range.
+    #     'normalize_thresholds': True,
+    #     # Hyperparameter for threshold normalization. Defines margin between
+    #     # threshold and maximum net input to a neuron. Larger ratio -> lower
+    #     # quantization error, but higher runtime needed.
+    #     'desired_threshold_to_input_ratio': 2**7,
+    #     # For DNNs it is recommended to set the biasExp = 6 and weightExponent = 0.
+    #     'compartment_kwargs': {'biasExp': 6, 'vThMant': 2 ** 9},
+    #     'connection_kwargs': {'numWeightBits': 8, 'weightExponent': 0}
+    # }
 
     config['output'] = {
             'log_vars': {'all'},
