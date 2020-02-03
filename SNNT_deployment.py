@@ -159,9 +159,9 @@ def create_config():
     }
 
     config_path = os.path.join(pathlib.Path().absolute(), 'conversion_config')
-    print(config_filepath)
     with open(config_path, 'w') as configfile:
         config.write(configfile)
+
     return config_path
 
 
@@ -169,5 +169,5 @@ if __name__ == "__main__":
     data = load_data(data_path)
     make_model(data, json_path, h5_path)
     gen_h5(json_path, h5_path)
-    config_filepath = create_config
+    config_filepath = create_config()
     main(config_filepath)
