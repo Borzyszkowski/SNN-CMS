@@ -64,11 +64,6 @@ def make_model(files, json_file, h5_file):
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
 
-    model_json = model.to_json()
-    with open(json_file, "w") as jf:
-        jf.write(model_json)
-    print("json model saved")
-
     batch_size = 128
     n_epochs = 50
 
@@ -93,6 +88,10 @@ def make_model(files, json_file, h5_file):
     print("h5 weight file saved")
     model.save_weights("./model_files/jet_file.ckpt")
     print('model files saved: meta, index and data')
+    model_json = model.to_json()
+    with open(json_file, "w") as jf:
+        jf.write(model_json)
+    print("json model saved")
 
 
 if __name__ == "__main__":

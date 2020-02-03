@@ -12,7 +12,6 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
 from sklearn.model_selection import train_test_split
 from inputs_to_h5 import gen_h5
 import glob
-import tensorflow as tf
 
 # give paths to the dataset folder and json + h5 files
 data_path = './dataset'
@@ -66,11 +65,6 @@ def make_model(files, json_file, h5_file):
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
 
-    model_json = model.to_json()
-    with open(json_file, "w") as jf:
-        jf.write(model_json)
-    print("json model saved")
-
     batch_size = 128
     n_epochs = 50
 
@@ -95,6 +89,10 @@ def make_model(files, json_file, h5_file):
     print("h5 weight file saved")
     model.save_weights("./model_files/jet_file.ckpt")
     print('model files saved: meta, index and data')
+    model_json = model.to_json()
+    with open(json_file, "w") as jf:
+        jf.write(model_json)
+    print("json model saved")
 
 
 def create_config():
@@ -103,7 +101,7 @@ def create_config():
     config['paths'] = {
         'path_wd': '.',                 # Path to model.
         'dataset_path': '.',            # Path to dataset.
-        'filename_ann': 'model2SNN',     # Name of input model.
+        'filename_ann': 'model2SNN',    # Name of input model.
         'runlabel': 'test'
     }
 
