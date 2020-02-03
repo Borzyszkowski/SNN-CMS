@@ -1,4 +1,4 @@
-"""Script to run Jet Tagging Task on Loihi, using SNN toolbox."""
+""" Script to run Jet Tagging Task on Loihi, using SNN toolbox """
 
 import os
 import time
@@ -158,7 +158,7 @@ def create_config():
             'plot_vars': {'all'}
     }
 
-    config_path = os.path.join(pathlib.Path().absolute(), 'conversion_config')
+    config_path = 'conversion_config'
     with open(config_path, 'w') as configfile:
         config.write(configfile)
 
