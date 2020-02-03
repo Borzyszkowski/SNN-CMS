@@ -109,7 +109,8 @@ def create_config():
     config['paths'] = {
         'path_wd': '.',                 # Path to model.
         'dataset_path': '.',            # Path to dataset.
-        'filename_ann': 'model2SNN'     # Name of input model.
+        'filename_ann': 'model2SNN',     # Name of input model.
+        'runlabel': 'test'
     }
 
     config['tools'] = {
@@ -146,8 +147,13 @@ def create_config():
     }
 
     config['output'] = {
-            'log_vars': {'all'},
-            'plot_vars': {'all'}
+        'log_vars': {'all'},
+        'plot_vars': {'all'}
+    }
+
+    config['input'] = {
+        'model_lib': 'keras',
+        'dataset_format': 'npz'
     }
 
     config_path = 'conversion_config'
