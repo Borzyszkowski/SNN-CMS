@@ -2,7 +2,7 @@
 
 import configparser
 from snntoolbox.bin.run import main
-
+import os
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +10,6 @@ from keras.models import Model
 from keras.layers import Dense, Input, Dropout
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau, TerminateOnNaN
 from sklearn.model_selection import train_test_split
-
 from inputs_to_h5 import gen_h5
 import glob
 import tensorflow as tf
