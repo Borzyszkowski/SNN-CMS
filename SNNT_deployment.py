@@ -103,7 +103,7 @@ def create_config():
 
     config['paths'] = {
         'path_wd': '.',                 # Path to model.
-        'dataset_path': '.',            # Path to dataset.
+        'dataset_path': data_path,      # Path to dataset.
         'filename_ann': 'model2SNN',    # Name of input model.
         'runlabel': 'test'
     }
