@@ -20,9 +20,10 @@ def load_data(data_folder):
 
 
 # this function makes the histogram of a given quantity for the five classes
-def disp_plot(feature_index, input_data, input_featurenames, data_representation='hl_features'):
+def disp_plot(feature_index, input_data, input_featurenames, target, data_representation='hl_features'):
     plt.subplots()
-    for particle in range(len(labelCat)):
+    label = ["gluon", "quark", "W", "Z", "top"]
+    for particle in range(len(label)):
         # high level features
         if data_representation == 'hl_features':
             # notice the use of numpy masking to select specific classes of jets
@@ -30,7 +31,7 @@ def disp_plot(feature_index, input_data, input_featurenames, data_representation
             # then plot the right quantity for the reduced array
             plt.hist(my_data[:, feature_index], 50, density=True, histtype='step', fill=False, linewidth=1.5)
         # image representation of data
-        elif data_representation == 'images':
+        elif data_representation == 'list_features':
             my_data = input_data[:, :, feature_index]
             # notice the use of numpy masking to select specific classes of jets
             my_data = my_data[np.argmax(target, axis=1) == particle]
@@ -39,22 +40,22 @@ def disp_plot(feature_index, input_data, input_featurenames, data_representation
         else:
             return
     plt.yscale('log', nonposy='clip')
-    plt.legend(labelCat, fontsize=12, frameon=False)
+    plt.legend(label, fontsize=12, frameon=False)
     plt.xlabel(str(input_featurenames[feature_index], "utf-8"), fontsize=15)
     plt.ylabel('Prob. Density (a.u.)', fontsize=15)
     plt.show()
 
 
-def image_data(targ, labels):
+def image_data(labels, targs):
     image = np.array(file.get('jetImage'))
-    image_g = image[np.argmax(targ, axis=1) == 0]
-    image_q = image[np.argmax(targ, axis=1) == 1]
-    image_W = image[np.argmax(targ, axis=1) == 2]
-    image_Z = image[np.argmax(targ, axis=1) == 3]
-    image_t = image[np.argmax(targ, axis=1) == 4]
+    image_g = image[np.argmax(targs, axis=1) == 0]
+    image_q = image[np.argmax(targs, axis=1) == 1]
+    image_W = image[np.argmax(targs, axis=1) == 2]
+    image_Z = image[np.argmax(targs, axis=1) == 3]
+    image_t = image[np.argmax(targs, axis=1) == 4]
     images = [image_q, image_g, image_W, image_Z, image_t]
     # for i in range(len(images)):
-    i = 0
+    i = 0  # replace to use the loop
     SUM_Image = np.sum(images[i], axis=0)
     plt.imshow(SUM_Image / float(images[i].shape[0]), origin='lower', norm=LogNorm(vmin=0.01))
     plt.colorbar()
@@ -64,7 +65,7 @@ def image_data(targ, labels):
     plt.show()
 
 
-def list_data(file):
+def list_data(file, targs):
     print("Particle feature names:")
     p_featurenames = file.get("particleFeatureNames")
     print(p_featurenames[:])
@@ -75,48 +76,53 @@ def list_data(file):
 
     # plot all the features
     # for i in range(len(p_featurenames)):
-    disp_plot(0, p_data, p_featurenames, 'images')
+    disp_plot(0, p_data, p_featurenames, targs, 'list_features')
 
 
-if __name__ == "__main__":
-    loaded_data = load_data(data_path)
-
-    print('structure of a single data file:')
-    f = loaded_data[0]
-    file = h5py.File(f)
-    print(list(file.keys()))
-
+def hlf_data():
     print('names of jets:')
     featurenames = file.get('jetFeatureNames')
     print(featurenames[:])
 
     jet_data = np.array(file.get('jets'))
-    target = jet_data[:, -6:-1]
-
-    labelCat = ["gluon", "quark", "W", "Z", "top"]
+    targs = jet_data[:, -6:-1]
 
     print("dataset shape:")
     data = np.array(jet_data[:, :])
     print(data.shape)
 
     print("targets shape:")
-    print(target.shape)
+    print(targs.shape)
 
     print("features shape:")
     features = np.array(jet_data[:, :-6])
     print(features.shape)
 
+    labels = ["gluon", "quark", "W", "Z", "top"]
     print("selected target classes:")
-    print(labelCat)
+    print(labels)
     print(featurenames[-6:-1])
 
-    """ The physics motivated high level features """
     # plot all the features
     # for i in range(len(featurenames[:-6])):
-    disp_plot(0, data, featurenames, 'hl_features')
+    disp_plot(0, data, featurenames, targs, 'hl_features')
+
+    return labels, targs
+
+
+if __name__ == "__main__":
+
+    loaded_data = load_data(data_path)
+    print('structure of a single data file:')
+    f = loaded_data[0]
+    file = h5py.File(f)
+    print(list(file.keys()))
+
+    """ The physics motivated high level features """
+    labelCat, targets = hlf_data()
 
     """ The image representation of particles """
-    image_data(target, labelCat)
+    image_data(labelCat, targets)
 
-    """ The particle list dataset """
-    list_data(file)
+    """ The particle-related list of features """
+    list_data(file, targets)
