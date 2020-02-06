@@ -35,7 +35,7 @@ This project is investigating the potential of Spiking neural networks deployed 
 
 ##### Other neuromorphic experiments with SNN Toolbox, Nengo and NxSDK:
 >~~~~
->git checkout Nengo_experiments
+>git checkout Neuromorphic_experiments
 >~~~~
 
 Use specific branches of the repository and follow instructions of README file in every branch.
