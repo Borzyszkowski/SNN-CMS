@@ -18,6 +18,11 @@ This project is investigating the potential of Spiking neural networks deployed 
 >git clone https://github.com/Borzyszkowski/SNN-CMS.git
 >~~~~
 
+##### Jet Tagging - Explore dataset:
+>~~~~
+>git checkout Jet_Tagging_data
+>~~~~
+
 ##### Jet Tagging - Simulation and Loihi on-chip inference with SNNToolbox:
 >~~~~
 >git checkout SNNToolbox_model
@@ -27,7 +32,6 @@ This project is investigating the potential of Spiking neural networks deployed 
 >~~~~
 >git checkout Nengo_model
 >~~~~
-
 
 ##### Other SNN experiments with Nengo and NxSDK:
 >~~~~
