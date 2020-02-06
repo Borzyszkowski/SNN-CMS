@@ -2,7 +2,7 @@
 
 ## Explore Jet Tagging dataset
 
-In this work, we explore the input files and different representations of data contained in it:
+In this work, we explore the input files and different representations of data that they contain:
 * A set of physics-motivated high-level features
 * Jets represented as an image
 * Jets represented as a list of particles 
