@@ -45,6 +45,39 @@ def disp_plot(feature_index, input_data, input_featurenames, data_representation
     plt.show()
 
 
+def image_data(targ, labels):
+    image = np.array(file.get('jetImage'))
+    image_g = image[np.argmax(targ, axis=1) == 0]
+    image_q = image[np.argmax(targ, axis=1) == 1]
+    image_W = image[np.argmax(targ, axis=1) == 2]
+    image_Z = image[np.argmax(targ, axis=1) == 3]
+    image_t = image[np.argmax(targ, axis=1) == 4]
+    images = [image_q, image_g, image_W, image_Z, image_t]
+    # for i in range(len(images)):
+    i = 0
+    SUM_Image = np.sum(images[i], axis=0)
+    plt.imshow(SUM_Image / float(images[i].shape[0]), origin='lower', norm=LogNorm(vmin=0.01))
+    plt.colorbar()
+    plt.title(labels[i], fontsize=15)
+    plt.xlabel("$\Delta\eta$ cell", fontsize=15)
+    plt.ylabel("$\Delta\phi$ cell", fontsize=15)
+    plt.show()
+
+
+def list_data(file):
+    print("Particle feature names:")
+    p_featurenames = file.get("particleFeatureNames")
+    print(p_featurenames[:])
+
+    print("Shape of list")
+    p_data = file.get("jetConstituentList")
+    print(p_data.shape)
+
+    # plot all the features
+    # for i in range(len(p_featurenames)):
+    disp_plot(0, p_data, p_featurenames, 'images')
+
+
 if __name__ == "__main__":
     loaded_data = load_data(data_path)
 
@@ -60,13 +93,13 @@ if __name__ == "__main__":
     jet_data = np.array(file.get('jets'))
     target = jet_data[:, -6:-1]
 
+    labelCat = ["gluon", "quark", "W", "Z", "top"]
+
     print("dataset shape:")
     data = np.array(jet_data[:, :])
     print(data.shape)
 
-    """ The physics - motivated high - level features """
-
-    print("target shape:")
+    print("targets shape:")
     print(target.shape)
 
     print("features shape:")
@@ -74,43 +107,16 @@ if __name__ == "__main__":
     print(features.shape)
 
     print("selected target classes:")
-    labelCat = ["gluon", "quark", "W", "Z", "top"]
     print(labelCat)
     print(featurenames[-6:-1])
 
+    """ The physics motivated high level features """
     # plot all the features
     # for i in range(len(featurenames[:-6])):
     disp_plot(0, data, featurenames, 'hl_features')
 
     """ The image representation of particles """
+    image_data(target, labelCat)
 
-    image = np.array(file.get('jetImage'))
-    image_g = image[np.argmax(target, axis=1) == 0]
-    image_q = image[np.argmax(target, axis=1) == 1]
-    image_W = image[np.argmax(target, axis=1) == 2]
-    image_Z = image[np.argmax(target, axis=1) == 3]
-    image_t = image[np.argmax(target, axis=1) == 4]
-    images = [image_q, image_g, image_W, image_Z, image_t]
-    # for i in range(len(images)):
-    i = 0
-    SUM_Image = np.sum(images[i], axis=0)
-    plt.imshow(SUM_Image / float(images[i].shape[0]), origin='lower', norm=LogNorm(vmin=0.01))
-    plt.colorbar()
-    plt.title(labelCat[i], fontsize=15)
-    plt.xlabel("$\Delta\eta$ cell", fontsize=15)
-    plt.ylabel("$\Delta\phi$ cell", fontsize=15)
-    plt.show()
-
-    """ The particle - list dataset """
-
-    print("Particle feature names:")
-    p_featurenames = file.get("particleFeatureNames")
-    print(p_featurenames[:])
-
-    print("Shape of list")
-    p_data = file.get("jetConstituentList")
-    print(p_data.shape)
-
-    # plot all the features
-    # for i in range(len(p_featurenames)):
-    disp_plot(0, p_data, p_featurenames, 'images')
+    """ The particle list dataset """
+    list_data(file)
