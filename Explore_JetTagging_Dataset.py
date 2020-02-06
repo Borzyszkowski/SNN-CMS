@@ -10,13 +10,11 @@ data_path = './dataset'
 
 
 def load_data(data_folder):
-    print("loading the dataset")
     # Get folder path containing text files
     file_list = glob.glob(data_folder + '/*.h5')
     data = []
     for file_path in file_list:
         data.append(file_path)
-    print("dataset loaded")
     print(f'dataset contains {len(data)} files')
     return data
 
@@ -50,7 +48,7 @@ def disp_plot(feature_index, input_data, input_featurenames, data_representation
 if __name__ == "__main__":
     loaded_data = load_data(data_path)
 
-    print('structure of data:')
+    print('structure of a single data file:')
     f = loaded_data[0]
     file = h5py.File(f)
     print(list(file.keys()))
@@ -102,6 +100,8 @@ if __name__ == "__main__":
     plt.xlabel("$\Delta\eta$ cell", fontsize=15)
     plt.ylabel("$\Delta\phi$ cell", fontsize=15)
     plt.show()
+
+    """ The particle - list dataset """
 
     print("Particle feature names:")
     p_featurenames = file.get("particleFeatureNames")
