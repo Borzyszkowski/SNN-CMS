@@ -1,18 +1,13 @@
 # SNN-CMS
-Simulation of Spiking Neural Networks in SNNToolbox to solve the Jet Tagging Problem.
 
-### How to run?
+## Explore Jet Tagging dataset
 
-##### training and simulation
->~~~~
->pip install -r requirements.txt
->python prepare_model.py
->snntoolbox conversion_config.txt -t
->~~~~
-##### training and hardware run
->~~~~
->SLURM=1 SNNT_deployment.py
->~~~~
+In this work, we explore the input files and different representations of data contained in it:
+* A set of physics-motivated high-level features
+* Jets represented as an image
+* Jets represented as a list of particles 
+
+These different representations will be used to train various kinds of networks while solving the same problem, a classification task aiming to distinguish jets originating from quarks, gluons, Ws, Zs, or top quarks.
 
 ### Useful links
 
