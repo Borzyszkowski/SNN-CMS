@@ -1,5 +1,5 @@
 # SNN-CMS
-Experiments with different SNN models to solve various problems using Nengo and NxSDK frameworks.
+Experiments with different SNN models to solve various problems using SNN Toolbox, Nengo and NxSDK frameworks.
 
 ### How to run?
 >~~~~
