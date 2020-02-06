@@ -1,7 +1,0 @@
-snntoolbox
-h5py
-numpy
-matplotlib
-sklearn
-tensorflow==2.1
-keras==2.3.1
