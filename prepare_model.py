@@ -64,12 +64,19 @@ def make_model(files, json_file, h5_file):
     batch_size = 128
     n_epochs = 50
 
+    # balance influence of each class in the dataset (0.2 by default since there are 5 classes)
+    class_weight = {0: 0.2,
+                    1: 0.2,
+                    2: 0.2,
+                    3: 0.2,
+                    4: 0.2}
+
     # training the model
     history = model.fit(x_train, y_train, epochs=n_epochs, batch_size=batch_size, verbose=2,
                         validation_data=(x_val, y_val),
                         callbacks=[EarlyStopping(monitor='val_loss', patience=10, verbose=1),
                                    ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=2, verbose=1),
-                                   TerminateOnNaN()])
+                                   TerminateOnNaN()], class_weight=class_weight)
 
     # visualizing the history
     plt.plot(history.history['loss'])
