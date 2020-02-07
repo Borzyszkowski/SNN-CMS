@@ -9,9 +9,12 @@ Experiments with different SNN models to solve various problems using SNN Toolbo
 To execute code on the remote Loihi Superhost please configure your machine using the following [instruction]( https://www.nengo.ai/nengo-loihi/installation.html). After a succesfull installation run the code on Superhost by adding `SLURM=1` to the command.
 
 #### - Spiking autoencoder on MNIST with SNN Toolbox
- `Spiking_autoencoder_MNIST.py`
+ `Spiking_autoencoder_MNIST_simulation.py`
 
- `snntoolbox conversion_config.txt -t`
+ `snntoolbox conversion_config_simulation.txt -t`
+
+#### - Spiking autoencoder on MNIST with Loihi deployment
+ `Spiking_autoencoder_MNIST_loihi.py`
 
 #### - Spiking MNIST classifier with Nengo
  `python Nengo_MNIST_Train.py`
