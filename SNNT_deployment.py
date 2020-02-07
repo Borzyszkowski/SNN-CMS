@@ -27,7 +27,7 @@ def load_data(data_folder):
     return data
 
 
-def make_model(files, json_file, h5_file):
+def make_model(files, json_file):
     # preparing the dataset
     target = np.array([])
     features = np.array([])
@@ -98,5 +98,5 @@ def make_model(files, json_file, h5_file):
 
 if __name__ == "__main__":
     data = load_data(data_path)
-    make_model(data, json_path, h5_path)
+    make_model(data, json_path)
     main(config_filepath)
