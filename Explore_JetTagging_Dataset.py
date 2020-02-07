@@ -102,6 +102,8 @@ def hlf_data():
     print("selected target classes:")
     print(labels)
     print(featurenames[-6:-1])
+    print("number of targets in data for each class:")
+    print(np.sum(targs, axis=0))
 
     # plot all the features
     # for i in range(len(featurenames[:-6])):
