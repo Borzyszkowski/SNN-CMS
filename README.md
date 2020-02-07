@@ -7,7 +7,7 @@ Simulation of Spiking Neural Networks in SNNToolbox to solve the Jet Tagging Pro
 >~~~~
 >pip install -r requirements.txt
 >python prepare_model.py
->snntoolbox conversion_config.txt -t
+>snntoolbox conversion_config_simulation.txt -t
 >~~~~
 ##### training and hardware run
 >~~~~
