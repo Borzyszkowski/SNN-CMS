@@ -1,2 +1,2 @@
 # SNN-CMS
-Direct training of Spiking Neural Networks to solve the Jet Tagging Problem with use of SLAYER.
+Direct training of Spiking Neural Networks in SLAYER to solve the Jet Tagging Problem.
