@@ -68,8 +68,8 @@ def genLoihiParams(net):
     fc1Weights = snn.utils.quantize(net.fc1.weight, 2).flatten().cpu().data.numpy()
     fc2Weights = snn.utils.quantize(net.fc2.weight, 2).flatten().cpu().data.numpy()
 
-    np.save('Trained/NMNISTFc1.npy', fc1Weights)
-    np.save('Trained/NMNISTFc2.npy', fc2Weights)
+    np.save('Trained_NMNIST/NMNISTFc1.npy', fc1Weights)
+    np.save('Trained_NMNIST/NMNISTFc2.npy', fc2Weights)
 
     plt.figure(11)
     plt.hist(fc1Weights, 256)
@@ -167,12 +167,12 @@ if __name__ == '__main__':
 
         # Update testing stats.
         stats.update()
-        stats.plot(saveFig=True, path='Trained/')
-        if stats.training.bestLoss is True:	torch.save(net.state_dict(), 'Trained/nmnistNet.pt')
+        stats.plot(saveFig=True, path='Trained_NMNIST/')
+        if stats.training.bestLoss is True:	torch.save(net.state_dict(), 'Trained_NMNIST/nmnistNet.pt')
 
     # Save training data
-    stats.save('Trained/')
-    net.load_state_dict(torch.load('Trained/nmnistNet.pt'))
+    stats.save('Trained_NMNIST/')
+    net.load_state_dict(torch.load('Trained_NMNIST/nmnistNet.pt'))
     genLoihiParams(net)
 
     # Plot the results
