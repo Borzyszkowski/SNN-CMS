@@ -15,7 +15,7 @@ with zipfile.ZipFile('NMNISTsmall.zip') as zip_file:
     for member in zip_file.namelist():
         if not os.path.exists('./' + member):
             zip_file.extract(member, './')
-			
+
 # Define dataset module
 class nmnistDataset(Dataset):
     def __init__(self, datasetPath, sampleFile, samplingTime, sampleLength):
@@ -65,66 +65,66 @@ class Network(torch.nn.Module):
 
 # Define Loihi parameter generator
 def genLoihiParams(net):
-	fc1Weights = snn.utils.quantize(net.fc1.weight, 2).flatten().cpu().data.numpy()
-	fc2Weights = snn.utils.quantize(net.fc2.weight, 2).flatten().cpu().data.numpy()
+    fc1Weights = snn.utils.quantize(net.fc1.weight, 2).flatten().cpu().data.numpy()
+    fc2Weights = snn.utils.quantize(net.fc2.weight, 2).flatten().cpu().data.numpy()
 
-	np.save('Trained/NMNISTFc1.npy', fc1Weights)
-	np.save('Trained/NMNISTFc2.npy', fc2Weights)
+    np.save('Trained/NMNISTFc1.npy', fc1Weights)
+    np.save('Trained/NMNISTFc2.npy', fc2Weights)
 
-	plt.figure(11)
-	plt.hist(fc1Weights, 256)
-	plt.title('fc1 weights')
+    plt.figure(11)
+    plt.hist(fc1Weights, 256)
+    plt.title('fc1 weights')
 
-	plt.figure(12)
-	plt.hist(fc2Weights, 256)
-	plt.title('fc2 weights')
+    plt.figure(12)
+    plt.hist(fc2Weights, 256)
+    plt.title('fc2 weights')
 
 if __name__ == '__main__':
-	# Define the cuda device to run the code on.
-	device = torch.device('cuda')
+    # Define the cuda device to run the code on.
+    device = torch.device('cuda')
 
-	# Create network instance.
-	net = Network(netParams).to(device)
+    # Create network instance.
+    net = Network(netParams).to(device)
 
-	# Create snn loss instance.
-	error = snn.loss(netParams, snn.loihi).to(device)
+    # Create snn loss instance.
+    error = snn.loss(netParams, snn.loihi).to(device)
 
-	# Define optimizer module.
-	# optimizer = torch.optim.Adam(net.parameters(), lr = 0.01, amsgrad = True)
-	optimizer = snn.utils.optim.Nadam(net.parameters(), lr = 0.01, amsgrad = True)
+    # Define optimizer module.
+    # optimizer = torch.optim.Adam(net.parameters(), lr = 0.01, amsgrad = True)
+    optimizer = snn.utils.optim.Nadam(net.parameters(), lr = 0.01, amsgrad = True)
 
-	# Dataset and dataLoader instances.
-	trainingSet = nmnistDataset(datasetPath =netParams['training']['path']['in'], 
-								sampleFile  =netParams['training']['path']['train'],
-								samplingTime=netParams['simulation']['Ts'],
-								sampleLength=netParams['simulation']['tSample'])
-	trainLoader = DataLoader(dataset=trainingSet, batch_size=12, shuffle=False, num_workers=4)
+    # Dataset and dataLoader instances.
+    trainingSet = nmnistDataset(datasetPath =netParams['training']['path']['in'], 
+                                sampleFile  =netParams['training']['path']['train'],
+                                samplingTime=netParams['simulation']['Ts'],
+                                sampleLength=netParams['simulation']['tSample'])
+    trainLoader = DataLoader(dataset=trainingSet, batch_size=12, shuffle=False, num_workers=4)
 
-	testingSet = nmnistDataset(datasetPath  =netParams['training']['path']['in'], 
-								sampleFile  =netParams['training']['path']['test'],
-								samplingTime=netParams['simulation']['Ts'],
-								sampleLength=netParams['simulation']['tSample'])
-	testLoader = DataLoader(dataset=testingSet, batch_size=12, shuffle=False, num_workers=4)
+    testingSet = nmnistDataset(datasetPath  =netParams['training']['path']['in'], 
+                                sampleFile  =netParams['training']['path']['test'],
+                                samplingTime=netParams['simulation']['Ts'],
+                                sampleLength=netParams['simulation']['tSample'])
+    testLoader = DataLoader(dataset=testingSet, batch_size=12, shuffle=False, num_workers=4)
 
-	# Learning stats instance.
-	stats = snn.utils.stats()
-	
-	# Visualize the input spikes (first five samples).
-	for i in range(5):
-		input, target, label = trainingSet[i]
-		snn.io.showTD(snn.io.spikeArrayToEvent(input.reshape((2, 34, 34, -1)).cpu().data.numpy()))
+    # Learning stats instance.
+    stats = snn.utils.stats()
 
-	for epoch in range(100):
-		tSt = datetime.now()
-	    # Training loop.
-		for i, (input, target, label) in enumerate(trainLoader, 0):
-			net.train()
-			# Move the input and target to correct GPU.
-			input  = input.to(device)
-			target = target.to(device) 
+    # Visualize the input spikes (first five samples).
+    for i in range(5):
+        input, target, label = trainingSet[i]
+        snn.io.showTD(snn.io.spikeArrayToEvent(input.reshape((2, 34, 34, -1)).cpu().data.numpy()))
 
-			# Forward pass of the network.
-			output = net.forward(input)
+    for epoch in range(100):
+        tSt = datetime.now()
+        # Training loop.
+        for i, (input, target, label) in enumerate(trainLoader, 0):
+            net.train()
+            # Move the input and target to correct GPU.
+            input  = input.to(device)
+            target = target.to(device) 
+
+            # Forward pass of the network.
+            output = net.forward(input)
 
 			# Gather the training stats.
 			stats.training.correctSamples += torch.sum( snn.predict.getClass(output) == label ).data.item()
@@ -148,48 +148,48 @@ if __name__ == '__main__':
 			# Display training stats.
 			stats.print(epoch, i, (datetime.now() - tSt).total_seconds())
 
-		# Testing loop.
-		# Same steps as Training loops except loss backpropagation and weight update.
-		for i, (input, target, label) in enumerate(testLoader, 0):
-			net.eval()
-			
-			input  = input.to(device)
-			target = target.to(device) 
+        # Testing loop.
+        # Same steps as Training loops except loss backpropagation and weight update.
+        for i, (input, target, label) in enumerate(testLoader, 0):
+            net.eval()
 
-			output = net.forward(input)
+            input  = input.to(device)
+            target = target.to(device) 
 
-			stats.testing.correctSamples += torch.sum( snn.predict.getClass(output) == label ).data.item()
-			stats.testing.numSamples     += len(label)
+            output = net.forward(input)
 
-			loss = error.numSpikes(output, target)
-			stats.testing.lossSum += loss.cpu().data.item()
-			stats.print(epoch, i)
+            stats.testing.correctSamples += torch.sum( snn.predict.getClass(output) == label ).data.item()
+            stats.testing.numSamples     += len(label)
 
-		# Update testing stats.
-		stats.update()
-		stats.plot(saveFig=True, path='Trained/')
-		if stats.training.bestLoss is True:	torch.save(net.state_dict(), 'Trained/nmnistNet.pt')
+            loss = error.numSpikes(output, target)
+            stats.testing.lossSum += loss.cpu().data.item()
+            stats.print(epoch, i)
 
-	# Save training data
-	stats.save('Trained/')
-	net.load_state_dict(torch.load('Trained/nmnistNet.pt'))
-	genLoihiParams(net)
+        # Update testing stats.
+        stats.update()
+        stats.plot(saveFig=True, path='Trained/')
+        if stats.training.bestLoss is True:	torch.save(net.state_dict(), 'Trained/nmnistNet.pt')
 
-	# Plot the results
-	# Learning loss
-	plt.figure(1)
-	plt.semilogy(stats.training.lossLog, label='Training')
-	plt.semilogy(stats.testing .lossLog, label='Testing')
-	plt.xlabel('Epoch')
-	plt.ylabel('Loss')
-	plt.legend()
+    # Save training data
+    stats.save('Trained/')
+    net.load_state_dict(torch.load('Trained/nmnistNet.pt'))
+    genLoihiParams(net)
 
-	# Learning accuracy
-	plt.figure(2)
-	plt.plot(stats.training.accuracyLog, label='Training')
-	plt.plot(stats.testing .accuracyLog, label='Testing')
-	plt.xlabel('Epoch')
-	plt.ylabel('Accuracy')
-	plt.legend()
+    # Plot the results
+    # Learning loss
+    plt.figure(1)
+    plt.semilogy(stats.training.lossLog, label='Training')
+    plt.semilogy(stats.testing .lossLog, label='Testing')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
 
-	plt.show()
+    # Learning accuracy
+    plt.figure(2)
+    plt.plot(stats.training.accuracyLog, label='Training')
+    plt.plot(stats.testing .accuracyLog, label='Testing')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    plt.show()
