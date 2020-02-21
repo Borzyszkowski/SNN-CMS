@@ -1,7 +1,4 @@
 import sys, os
-CURRENT_TEST_DIR = os.getcwd()
-sys.path.append(CURRENT_TEST_DIR + "/../../src")
-
 from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,12 +9,6 @@ import zipfile
 
 # Read SNN configuration from yaml file
 netParams = snn.params('network.yaml')
-
-# Ts   = netParams['simulation']['Ts']
-# Ns   = int(netParams['simulation']['tSample'] / netParams['simulation']['Ts'])
-# Nin  = int(netParams['layer'][0]['dim'])
-# Nhid = int(netParams['layer'][1]['dim'])
-# Nout = int(netParams['layer'][2]['dim'])
 
 # Extract NMNISTsmall dataset
 with zipfile.ZipFile('NMNISTsmall.zip') as zip_file:
@@ -74,8 +65,8 @@ class Network(torch.nn.Module):
 
 # Define Loihi parameter generator
 def genLoihiParams(net):
-	fc1Weights = snn.uitls.quantize(net.fc1.weight, 2).flatten().cpu().data.numpy()
-	fc2Weights = snn.uitls.quantize(net.fc2.weight, 2).flatten().cpu().data.numpy()
+	fc1Weights = snn.utils.quantize(net.fc1.weight, 2).flatten().cpu().data.numpy()
+	fc2Weights = snn.utils.quantize(net.fc2.weight, 2).flatten().cpu().data.numpy()
 
 	np.save('Trained/NMNISTFc1.npy', fc1Weights)
 	np.save('Trained/NMNISTFc2.npy', fc2Weights)
