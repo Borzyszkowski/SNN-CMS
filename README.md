@@ -26,8 +26,7 @@
   <p align="center">
   <br>
     <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
-    <a href=https://www.zenodo.net/record/3755310#.YqxD0HVBzJU><img alt="Paper" src='https://img.shields.io/badge/Paper-PDF-green?style=flat&logo=arXiv&logoColor=green' alt='Paper PDF'></a>
-    
+    <a href=https://doi.org/10.5281/zenodo.3755310><img alt="Paper" src='https://img.shields.io/badge/Paper-PDF-green?style=flat&logo=arXiv&logoColor=green' alt='Paper PDF'></a>
     
          
    
