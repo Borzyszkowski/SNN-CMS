@@ -10,7 +10,7 @@
 
   </p>
   
-  <h5 align="center">European Organization for Nuclear Research (CERN), Geneva, Switzerland
+  <h5 align="center">European Organization for Nuclear Research (CERN)
     <br>
    Espl. des Particules 1, 1211 Meyrin, Switzerland
   </h5>
