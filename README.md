@@ -19,7 +19,7 @@
   <div align="center">
   </div>
 <br>
-<p align="center"><img src="https://openlab.cern/sites/default/files/LOGO_CERN_openlab_0.png" width="300" align="middle"></p>
+<p align="center"><img src="https://openlab.cern/sites/default/files/logo/LOGO_CERN_openlab_0.png" width="300" align="middle"></p>
 
 
 
