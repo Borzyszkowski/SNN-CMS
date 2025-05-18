@@ -18,13 +18,11 @@
   
   <div align="center">
   </div>
-<br>
-<p align="center"><img src="https://openlab.cern/sites/default/files/logo/LOGO_CERN_openlab_0.png" width="300" align="middle"></p>
+<p align="center"><img src="https://d1c2gz5q23tkk0.cloudfront.net/shrine_store/uploads/networks/89/ne_events/154996/wide-19b5704af5009afd4f2a821100c13ef4.webp" width="300" align="middle"></p>
 
 
 
   <p align="center">
-  <br>
     <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
     <a href=https://doi.org/10.5281/zenodo.3755310><img alt="Paper" src='https://img.shields.io/badge/Paper-PDF-green?style=flat&logo=arXiv&logoColor=green' alt='Paper PDF'></a>
     
